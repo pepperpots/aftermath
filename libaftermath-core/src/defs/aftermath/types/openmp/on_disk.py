@@ -253,6 +253,11 @@ am_dsk_openmp_thread = EventFrame(
             field_type = aftermath.types.builtin.uint64_t,
             comment = "Thread type")]))
 
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_thread,
+    aftermath.types.openmp.in_memory.am_openmp_thread,
+    "collection_id")
+
 ################################################################################
 
 am_dsk_openmp_parallel = EventFrame(
@@ -272,6 +277,11 @@ am_dsk_openmp_parallel = EventFrame(
               name = "flags",
               field_type = aftermath.types.builtin.uint16_t,
               comment = "Type of the parallel region")]))
+
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_parallel,
+    aftermath.types.openmp.in_memory.am_openmp_parallel,
+    "collection_id")
 
 ################################################################################
 
@@ -293,6 +303,11 @@ am_dsk_openmp_task_create = EventFrame(
             field_type = aftermath.types.builtin.uint8_t,
             comment = "True if the task has dependences")]))
 
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_task_create,
+    aftermath.types.openmp.in_memory.am_openmp_task_create,
+    "collection_id")
+
 ################################################################################
 
 am_dsk_openmp_task_schedule = EventFrame(
@@ -308,6 +323,11 @@ am_dsk_openmp_task_schedule = EventFrame(
             name = "prior_task_status",
             field_type = aftermath.types.builtin.uint8_t,
             comment = "Status of the task at the scheduling point")]))
+
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_task_schedule,
+    aftermath.types.openmp.in_memory.am_openmp_task_schedule,
+    "collection_id")
 
 ################################################################################
 
@@ -333,6 +353,11 @@ am_dsk_openmp_implicit_task = EventFrame(
             field_type = aftermath.types.builtin.uint8_t,
             comment = "Indication if the task is initial or implicit")]))
 
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_implicit_task,
+    aftermath.types.openmp.in_memory.am_openmp_implicit_task,
+    "collection_id")
+
 ################################################################################
 
 am_dsk_openmp_sync_region_wait = EventFrame(
@@ -349,6 +374,11 @@ am_dsk_openmp_sync_region_wait = EventFrame(
             field_type = aftermath.types.builtin.uint8_t,
             comment = "Argument indicates a type of the synchronization "
                       + "construct")]))
+
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_sync_region_wait,
+    aftermath.types.openmp.in_memory.am_openmp_sync_region_wait,
+    "collection_id")
 
 ################################################################################
 
@@ -370,6 +400,11 @@ am_dsk_openmp_mutex_released = EventFrame(
             field_type = aftermath.types.builtin.uint8_t,
             comment = "Type of the mutual exclusion event")]))
 
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_mutex_released,
+    aftermath.types.openmp.in_memory.am_openmp_mutex_released,
+    "collection_id")
+
 ###############################################################################
 
 am_dsk_openmp_dependences = EventFrame(
@@ -387,6 +422,11 @@ am_dsk_openmp_dependences = EventFrame(
             field_type = aftermath.types.builtin.uint32_t,
             comment = "Number of dependences")]))
 
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_dependences,
+    aftermath.types.openmp.in_memory.am_openmp_dependences,
+    "collection_id")
+
 ################################################################################
 
 am_dsk_openmp_task_dependence = EventFrame(
@@ -399,6 +439,11 @@ am_dsk_openmp_task_dependence = EventFrame(
             name = "timestamp",
             field_type = aftermath.types.builtin.uint64_t,
             comment = "Time of the event")]))
+
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_task_dependence,
+    aftermath.types.openmp.in_memory.am_openmp_task_dependence,
+    "collection_id")
 
 ################################################################################
 
@@ -420,6 +465,11 @@ am_dsk_openmp_work = EventFrame(
             field_type = aftermath.types.builtin.uint64_t,
             comment = "Measure of quantity involved in work")]))
 
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_work,
+    aftermath.types.openmp.in_memory.am_openmp_work,
+    "collection_id")
+
 ################################################################################
 
 am_dsk_openmp_master = EventFrame(
@@ -431,6 +481,11 @@ am_dsk_openmp_master = EventFrame(
             name = "interval",
             field_type = aftermath.types.on_disk.am_dsk_interval,
             comment = "Start and end of the execution interval")]))
+
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_master,
+    aftermath.types.openmp.in_memory.am_openmp_master,
+    "collection_id")
 
 ################################################################################
 
@@ -447,6 +502,11 @@ am_dsk_openmp_sync_region = EventFrame(
             name = "kind",
             field_type = aftermath.types.builtin.uint8_t,
             comment = "Type of the synchronization construct")]))
+
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_sync_region,
+    aftermath.types.openmp.in_memory.am_openmp_sync_region,
+    "collection_id")
 
 ################################################################################
 
@@ -468,6 +528,11 @@ am_dsk_openmp_lock_init = EventFrame(
             field_type = aftermath.types.builtin.uint8_t,
             comment = "Type of the lock")]))
 
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_lock_init,
+    aftermath.types.openmp.in_memory.am_openmp_lock_init,
+    "collection_id")
+
 ################################################################################
 
 am_dsk_openmp_lock_destroy = EventFrame(
@@ -487,6 +552,11 @@ am_dsk_openmp_lock_destroy = EventFrame(
             name = "kind",
             field_type = aftermath.types.builtin.uint8_t,
             comment = "Type of the lock")]))
+
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_lock_destroy,
+    aftermath.types.openmp.in_memory.am_openmp_lock_destroy,
+    "collection_id")
 
 ################################################################################
 
@@ -516,6 +586,11 @@ am_dsk_openmp_mutex_acquire = EventFrame(
             field_type = aftermath.types.builtin.uint32_t,
             comment = "Mechanism chosen by runtime to implement the mutex")]))
 
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_mutex_acquire,
+    aftermath.types.openmp.in_memory.am_openmp_mutex_acquire,
+    "collection_id")
+
 ################################################################################
 
 am_dsk_openmp_mutex_acquired = EventFrame(
@@ -536,6 +611,11 @@ am_dsk_openmp_mutex_acquired = EventFrame(
             field_type = aftermath.types.builtin.uint8_t,
             comment = "Type of the mutual exclusion")]))
 
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_mutex_acquired,
+    aftermath.types.openmp.in_memory.am_openmp_mutex_acquired,
+    "collection_id")
+
 ################################################################################
 
 am_dsk_openmp_nest_lock = EventFrame(
@@ -552,6 +632,11 @@ am_dsk_openmp_nest_lock = EventFrame(
             field_type = aftermath.types.builtin.uint64_t,
             comment = "ID of the object that is locked")]))
 
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_nest_lock,
+    aftermath.types.openmp.in_memory.am_openmp_nest_lock,
+    "collection_id")
+
 ################################################################################
 
 am_dsk_openmp_flush = EventFrame(
@@ -563,6 +648,11 @@ am_dsk_openmp_flush = EventFrame(
             name = "timestamp",
             field_type = aftermath.types.builtin.uint64_t,
             comment = "Time of the event")]))
+
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_flush,
+    aftermath.types.openmp.in_memory.am_openmp_flush,
+    "collection_id")
 
 ################################################################################
 
@@ -579,6 +669,11 @@ am_dsk_openmp_cancel = EventFrame(
             name = "flags",
             field_type = aftermath.types.builtin.uint8_t,
             comment = "Cancellation source and cancelled construct information")]))
+
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_openmp_cancel,
+    aftermath.types.openmp.in_memory.am_openmp_cancel,
+    "collection_id")
 
 ################################################################################
 

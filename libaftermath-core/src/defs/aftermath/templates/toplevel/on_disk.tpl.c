@@ -1,5 +1,6 @@
 /**
  * Author: Andi Drebes <andi@drebesium.org>
+ * Author: Igor Wodiany <igor.wodiany@manchester.ac.uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as published
@@ -25,6 +26,25 @@
 #include <aftermath/core/openmp_task_instance_array.h>
 #include <aftermath/core/openmp_task_period_array.h>
 #include <aftermath/core/openmp_task_type_array.h>
+#include <aftermath/core/openmp_thread_array.h>
+#include <aftermath/core/openmp_parallel_array.h>
+#include <aftermath/core/openmp_task_create_array.h>
+#include <aftermath/core/openmp_task_schedule_array.h>
+#include <aftermath/core/openmp_implicit_task_array.h>
+#include <aftermath/core/openmp_sync_region_wait_array.h>
+#include <aftermath/core/openmp_mutex_released_array.h>
+#include <aftermath/core/openmp_dependences_array.h>
+#include <aftermath/core/openmp_task_dependence_array.h>
+#include <aftermath/core/openmp_work_array.h>
+#include <aftermath/core/openmp_master_array.h>
+#include <aftermath/core/openmp_sync_region_array.h>
+#include <aftermath/core/openmp_lock_init_array.h>
+#include <aftermath/core/openmp_lock_destroy_array.h>
+#include <aftermath/core/openmp_mutex_acquire_array.h>
+#include <aftermath/core/openmp_mutex_acquired_array.h>
+#include <aftermath/core/openmp_nest_lock_array.h>
+#include <aftermath/core/openmp_flush_array.h>
+#include <aftermath/core/openmp_cancel_array.h>
 #include <aftermath/core/openstream_task_instance_array.h>
 #include <aftermath/core/openstream_task_period_array.h>
 #include <aftermath/core/openstream_task_type_array.h>

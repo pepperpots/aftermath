@@ -211,6 +211,25 @@ libaftermath_core_la_SOURCES = src/ansi_extras.c \
 				src/openmp_task_instance_array.h \
 				src/openmp_task_period_array.h \
 				src/openmp_task_type_array.h \
+				src/openmp_thread_array.h \
+				src/openmp_parallel_array.h \
+				src/openmp_task_create_array.h \
+				src/openmp_task_schedule_array.h \
+				src/openmp_implicit_task_array.h \
+				src/openmp_sync_region_wait_array.h \
+				src/openmp_mutex_released_array.h \
+				src/openmp_dependences_array.h \
+				src/openmp_task_dependence_array.h \
+				src/openmp_work_array.h \
+				src/openmp_master_array.h \
+				src/openmp_sync_region_array.h \
+				src/openmp_lock_init_array.h \
+				src/openmp_lock_destroy_array.h \
+				src/openmp_mutex_acquire_array.h \
+				src/openmp_mutex_acquired_array.h \
+				src/openmp_nest_lock_array.h \
+				src/openmp_flush_array.h \
+				src/openmp_cancel_array.h \
 				src/openstream_task_instance_array.h \
 				src/openstream_task_period_array.h \
 				src/openstream_task_type_array.h \
