@@ -168,6 +168,25 @@ ICONS = \
 	share/icons/draw_openmp_task_types.svg \
 	share/icons/draw_openmp_task_instances.svg \
 	share/icons/draw_openmp_task_periods.svg \
+	share/icons/draw_openmp_thread.svg \
+	share/icons/draw_openmp_parallel.svg \
+	share/icons/draw_openmp_task_create.svg \
+	share/icons/draw_openmp_task_schedule.svg \
+	share/icons/draw_openmp_implicit_task.svg \
+	share/icons/draw_openmp_sync_region_wait.svg \
+	share/icons/draw_openmp_mutex_released.svg \
+	share/icons/draw_openmp_dependences.svg \
+	share/icons/draw_openmp_task_dependence.svg \
+	share/icons/draw_openmp_work.svg \
+	share/icons/draw_openmp_master.svg \
+	share/icons/draw_openmp_sync_region.svg \
+	share/icons/draw_openmp_lock_init.svg \
+	share/icons/draw_openmp_lock_destroy.svg \
+	share/icons/draw_openmp_mutex_acquire.svg \
+	share/icons/draw_openmp_mutex_acquired.svg \
+	share/icons/draw_openmp_nest_lock.svg \
+	share/icons/draw_openmp_flush.svg \
+	share/icons/draw_openmp_cancel.svg \
 	share/icons/draw_tf_node_executions.svg
 
 # Install profiles

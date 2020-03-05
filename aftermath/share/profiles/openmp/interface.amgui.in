@@ -15,7 +15,7 @@ am_gui {
 						amgui_toolbar_togglebutton {
 							tooltip: "Draw OpenMP loop types",
 							icon: "@ICON_BASEDIR@/draw_openmp_loop_types.svg",
-							checked: 1u64,
+              checked: 0u64,
 							id: "toolbutton_draw_openmp_loop_types"
 						},
 						amgui_toolbar_togglebutton {
@@ -53,6 +53,120 @@ am_gui {
 							icon: "@ICON_BASEDIR@/draw_openmp_task_periods.svg",
 							checked: 0u64,
 							id: "toolbutton_draw_openmp_task_periods"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP thread region",
+							icon: "@ICON_BASEDIR@/draw_openmp_thread.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_thread"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP parallel region",
+							icon: "@ICON_BASEDIR@/draw_openmp_parallel.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_parallel"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP task create",
+							icon: "@ICON_BASEDIR@/draw_openmp_task_create.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_task_create"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP task schedule",
+							icon: "@ICON_BASEDIR@/draw_openmp_task_schedule.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_task_schedule"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP implicit task region",
+							icon: "@ICON_BASEDIR@/draw_openmp_implicit_task.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_implicit_task"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP sync region wait",
+							icon: "@ICON_BASEDIR@/draw_openmp_sync_region_wait.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_sync_region_wait"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP mutex released",
+							icon: "@ICON_BASEDIR@/draw_openmp_mutex_released.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_mutex_released"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP dependences",
+							icon: "@ICON_BASEDIR@/draw_openmp_dependences.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_dependences"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP task dependence",
+							icon: "@ICON_BASEDIR@/draw_openmp_task_dependence.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_task_dependence"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP workshare region",
+							icon: "@ICON_BASEDIR@/draw_openmp_work.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_work"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP master region",
+							icon: "@ICON_BASEDIR@/draw_openmp_master.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_master"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP sync region",
+							icon: "@ICON_BASEDIR@/draw_openmp_sync_region.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_sync_region"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP lock init",
+							icon: "@ICON_BASEDIR@/draw_openmp_lock_init.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_lock_init"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP lock destroy",
+							icon: "@ICON_BASEDIR@/draw_openmp_lock_destroy.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_lock_destroy"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP mutex acquire",
+							icon: "@ICON_BASEDIR@/draw_openmp_mutex_acquire.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_mutex_acquire"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP mutex acquired",
+							icon: "@ICON_BASEDIR@/draw_openmp_mutex_acquired.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_mutex_acquired"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP nest lock",
+							icon: "@ICON_BASEDIR@/draw_openmp_nest_lock.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_nest_lock"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP flush",
+							icon: "@ICON_BASEDIR@/draw_openmp_flush.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_flush"
+						},
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw OpenMP cancel",
+							icon: "@ICON_BASEDIR@/draw_openmp_cancel.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_openmp_cancel"
 						}
 					]
 				},
@@ -84,7 +198,7 @@ am_gui {
 							children : [
 								amgui_timeline {
 									id: "tl1",
-									layers: ["background", "hierarchy", "axes", "openmp::for_loop_type", "openmp::for_loop_instance", "openmp::iteration_set", "openmp::iteration_period", "openmp::task_type", "openmp::task_instance", "openmp::task_period", "state", "selection"]
+									layers: ["background", "hierarchy", "axes", "openmp::for_loop_type", "openmp::for_loop_instance", "openmp::iteration_set", "openmp::iteration_period", "openmp::task_type", "openmp::task_instance", "openmp::task_period", "openmp::thread", "openmp::parallel", "openmp::implicit_task", "openmp::sync_region", "openmp::work", "openmp::master", "openmp::sync_region_wait", "openmp::nest_lock", "openmp::flush", "openmp::mutex_acquire", "openmp::mutex_acquired", "openmp::mutex_released", "openmp::lock_init", "openmp::lock_destroy", "openmp::task_create", "openmp::task_schedule", "openmp::dependences", "openmp::task_dependence", "openmp::cancel", "state", "selection"]
 								},
 
 								amgui_dfg { }
