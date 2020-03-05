@@ -1,5 +1,6 @@
 /**
  * Author: Andi Drebes <andi@drebesium.org>
+ * Author: Igor Wodiany <igor.wodiany@manchester.ac.uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as published
@@ -83,3 +84,175 @@ AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
 AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
 	openmp_task_period,
 	"openmp::task_period")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_thread,
+	"openmp::thread",
+	struct am_timeline_openmp_thread_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_thread,
+	"openmp::thread")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_parallel,
+	"openmp::parallel",
+	struct am_timeline_openmp_parallel_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_parallel,
+	"openmp::parallel")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_task_create,
+	"openmp::task_create",
+	struct am_timeline_openmp_task_create_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_task_create,
+	"openmp::task_create")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_task_schedule,
+	"openmp::task_schedule",
+	struct am_timeline_openmp_task_schedule_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_task_schedule,
+	"openmp::task_schedule")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_implicit_task,
+	"openmp::implicit_task",
+	struct am_timeline_openmp_implicit_task_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_implicit_task,
+	"openmp::implicit_task")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_sync_region_wait,
+	"openmp::sync_region_wait",
+	struct am_timeline_openmp_sync_region_wait_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_sync_region_wait,
+	"openmp::sync_region_wait")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_mutex_released,
+	"openmp::mutex_released",
+	struct am_timeline_openmp_mutex_released_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_mutex_released,
+	"openmp::mutex_released")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_dependences,
+	"openmp::dependences",
+	struct am_timeline_openmp_dependences_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_dependences,
+	"openmp::dependences")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_task_dependence,
+	"openmp::task_dependence",
+	struct am_timeline_openmp_task_dependence_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_task_dependence,
+	"openmp::task_dependence")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_work,
+	"openmp::work",
+	struct am_timeline_openmp_work_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_work,
+	"openmp::work")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_master,
+	"openmp::master",
+	struct am_timeline_openmp_master_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_master,
+	"openmp::master")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_sync_region,
+	"openmp::sync_region",
+	struct am_timeline_openmp_sync_region_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_sync_region,
+	"openmp::sync_region")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_lock_init,
+	"openmp::lock_init",
+	struct am_timeline_openmp_lock_init_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_lock_init,
+	"openmp::lock_init")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_lock_destroy,
+	"openmp::lock_destroy",
+	struct am_timeline_openmp_lock_destroy_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_lock_destroy,
+	"openmp::lock_destroy")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_mutex_acquire,
+	"openmp::mutex_acquire",
+	struct am_timeline_openmp_mutex_acquire_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_mutex_acquire,
+	"openmp::mutex_acquire")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_mutex_acquired,
+	"openmp::mutex_acquired",
+	struct am_timeline_openmp_mutex_acquired_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_mutex_acquired,
+	"openmp::mutex_acquired")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_nest_lock,
+	"openmp::nest_lock",
+	struct am_timeline_openmp_nest_lock_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_nest_lock,
+	"openmp::nest_lock")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_flush,
+	"openmp::flush",
+	struct am_timeline_openmp_flush_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_flush,
+	"openmp::flush")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_cancel,
+	"openmp::cancel",
+	struct am_timeline_openmp_cancel_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_cancel,
+	"openmp::cancel")
+

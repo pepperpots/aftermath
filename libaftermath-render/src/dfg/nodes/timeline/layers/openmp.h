@@ -1,5 +1,6 @@
 /**
  * Author: Andi Drebes <andi@drebesium.org>
+ * Author: Igor Wodiany <igor.wodiany@manchester.ac.uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as published
@@ -113,6 +114,253 @@ AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
 int am_render_dfg_timeline_openmp_task_period_layer_configuration_node_process(
 	struct am_dfg_node* n);
 
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_thread,
+	"openmp::thread",
+	"Timeline OpenMP Thread Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_thread,
+	"openmp::thread",
+	"Timeline OpenMP Thread Layer Configuration")
+
+int am_render_dfg_timeline_openmp_thread_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_parallel,
+	"openmp::parallel",
+	"Timeline OpenMP Parallel Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_parallel,
+	"openmp::parallel",
+	"Timeline OpenMP Parallel Layer Configuration")
+
+int am_render_dfg_timeline_openmp_parallel_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_task_create,
+	"openmp::task_create",
+	"Timeline OpenMP Task Create Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_task_create,
+	"openmp::task_create",
+	"Timeline OpenMP Task Create Layer Configuration")
+
+int am_render_dfg_timeline_openmp_task_create_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_task_schedule,
+	"openmp::task_schedule",
+	"Timeline OpenMP Task Schedule Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_task_schedule,
+	"openmp::task_schedule",
+	"Timeline OpenMP Task Schedule Layer Configuration")
+
+int am_render_dfg_timeline_openmp_task_schedule_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_implicit_task,
+	"openmp::implicit_task",
+	"Timeline OpenMP Implicit Task Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_implicit_task,
+	"openmp::implicit_task",
+	"Timeline OpenMP Implicit Task Layer Configuration")
+
+int am_render_dfg_timeline_openmp_implicit_task_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_sync_region_wait,
+	"openmp::sync_region_wait",
+	"Timeline OpenMP Sync Region Wait Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_sync_region_wait,
+	"openmp::sync_region_wait",
+	"Timeline OpenMP Sync Region Wait Layer Configuration")
+
+int am_render_dfg_timeline_openmp_sync_region_wait_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_mutex_released,
+	"openmp::mutex_released",
+	"Timeline OpenMP Mutex Released Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_mutex_released,
+	"openmp::mutex_released",
+	"Timeline OpenMP Mutex Released Layer Configuration")
+
+int am_render_dfg_timeline_openmp_mutex_released_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_dependences,
+	"openmp::dependences",
+	"Timeline OpenMP Dependences Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_dependences,
+	"openmp::dependences",
+	"Timeline OpenMP Dependences Layer Configuration")
+
+int am_render_dfg_timeline_openmp_dependences_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_task_dependence,
+	"openmp::task_dependence",
+	"Timeline OpenMP Task Dependence Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_task_dependence,
+	"openmp::task_dependence",
+	"Timeline OpenMP Task Dependence Layer Configuration")
+
+int am_render_dfg_timeline_openmp_task_dependence_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_work,
+	"openmp::work",
+	"Timeline OpenMP Worksharing Region Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_work,
+	"openmp::work",
+	"Timeline OpenMP Worksharing Region Layer Configuration")
+
+int am_render_dfg_timeline_openmp_work_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_master,
+	"openmp::master",
+	"Timeline OpenMP Master Region Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_master,
+	"openmp::master",
+	"Timeline OpenMP Master Region Layer Configuration")
+
+int am_render_dfg_timeline_openmp_master_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_sync_region,
+	"openmp::sync_region",
+	"Timeline OpenMP Sync Region Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_sync_region,
+	"openmp::sync_region",
+	"Timeline OpenMP Sync Region Layer Configuration")
+
+int am_render_dfg_timeline_openmp_sync_region_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_lock_init,
+	"openmp::lock_init",
+	"Timeline OpenMP Mutex Lock Init Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_lock_init,
+	"openmp::lock_init",
+	"Timeline OpenMP Mutex Lock Init Configuration")
+
+int am_render_dfg_timeline_openmp_lock_init_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_lock_destroy,
+	"openmp::lock_destroy",
+	"Timeline OpenMP Mutex Lock Destroy Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_lock_destroy,
+	"openmp::lock_destroy",
+	"Timeline OpenMP Mutex Lock Destroy Configuration")
+
+int am_render_dfg_timeline_openmp_lock_destroy_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_mutex_acquire,
+	"openmp::mutex_acquire",
+	"Timeline OpenMP Mutex Acquire Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_mutex_acquire,
+	"openmp::mutex_acquire",
+	"Timeline OpenMP Mutex Acquire Layer Configuration")
+
+int am_render_dfg_timeline_openmp_mutex_acquire_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_mutex_acquired,
+	"openmp::mutex_acquired",
+	"Timeline OpenMP Mutex Acquired Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_mutex_acquired,
+	"openmp::mutex_acquired",
+	"Timeline OpenMP Mutex Acquired Layer Configuration")
+
+int am_render_dfg_timeline_openmp_mutex_acquired_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_nest_lock,
+	"openmp::nest_lock",
+	"Timeline OpenMP Nest Lock Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_nest_lock,
+	"openmp::nest_lock",
+	"Timeline OpenMP Nest Lock Layer Configuration")
+
+int am_render_dfg_timeline_openmp_nest_lock_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_flush,
+	"openmp::flush",
+	"Timeline OpenMP Flush Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_flush,
+	"openmp::flush",
+	"Timeline OpenMP Flush Layer Configuration")
+
+int am_render_dfg_timeline_openmp_flush_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	openmp_cancel,
+	"openmp::cancel",
+	"Timeline OpenMP Cancel Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	openmp_cancel,
+	"openmp::cancel",
+	"Timeline OpenMP Cancel Layer Configuration")
+
+int am_render_dfg_timeline_openmp_cancel_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
 AM_DFG_ADD_BUILTIN_NODE_TYPES(
 	&am_render_dfg_timeline_openmp_for_loop_type_layer_filter_node_type,
 	&am_render_dfg_timeline_openmp_for_loop_type_layer_configuration_node_type,
@@ -127,6 +375,44 @@ AM_DFG_ADD_BUILTIN_NODE_TYPES(
 	&am_render_dfg_timeline_openmp_task_instance_layer_filter_node_type,
 	&am_render_dfg_timeline_openmp_task_instance_layer_configuration_node_type,
 	&am_render_dfg_timeline_openmp_task_period_layer_filter_node_type,
-	&am_render_dfg_timeline_openmp_task_period_layer_configuration_node_type)
+	&am_render_dfg_timeline_openmp_task_period_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_thread_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_thread_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_parallel_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_parallel_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_task_create_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_task_create_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_task_schedule_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_task_schedule_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_implicit_task_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_implicit_task_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_sync_region_wait_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_sync_region_wait_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_mutex_released_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_mutex_released_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_dependences_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_dependences_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_task_dependence_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_task_dependence_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_work_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_work_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_master_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_master_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_sync_region_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_sync_region_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_lock_init_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_lock_init_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_lock_destroy_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_lock_destroy_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_mutex_acquire_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_mutex_acquire_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_mutex_acquired_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_mutex_acquired_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_nest_lock_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_nest_lock_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_flush_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_flush_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_cancel_layer_filter_node_type,
+	&am_render_dfg_timeline_openmp_cancel_layer_configuration_node_type)
 
 #endif

@@ -1,5 +1,6 @@
 /**
  * Author: Andi Drebes <andi@drebesium.org>
+ * Author: Igor Wodiany <igor.wodiany@manchester.ac.uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as published
@@ -39,5 +40,62 @@ am_timeline_openmp_task_instance_layer_instantiate_type(void);
 
 struct am_timeline_render_layer_type*
 am_timeline_openmp_task_period_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_thread_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_parallel_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_task_create_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_task_schedule_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_implicit_task_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_sync_region_wait_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_mutex_released_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_dependences_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_task_dependence_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_work_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_master_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_sync_region_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_lock_init_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_lock_destroy_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_mutex_acquire_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_mutex_acquired_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_nest_lock_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_flush_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_openmp_cancel_layer_instantiate_type(void);
 
 #endif
