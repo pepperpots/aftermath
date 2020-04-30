@@ -32,8 +32,8 @@
 #include <aftermath/render/timeline/renderer.h>
 
 struct am_color_map openmp_colors = AM_STATIC_COLOR_MAP({
-		  AM_RGBA255_EL(229, 115, 115, 255),
-			AM_RGBA255_EL(186, 104, 200, 255),
+		  AM_RGBA255_EL(0xfc, 0xcc, 0x9b, 255),
+			AM_RGBA255_EL(0x2a, 0x58, 0x41, 255),
 			AM_RGBA255_EL(132, 134, 203, 255),
 			AM_RGBA255_EL( 79, 195, 247, 255),
 			AM_RGBA255_EL( 77, 182, 172, 255),
@@ -271,8 +271,24 @@ static size_t calculate_index_iteration_period(
 
 	/* Some arbitrary expression with reproducible indexes across for the
 	 * same trace */
-	return ((size_t)ip->interval.start * ip->interval.end) %
-		openmp_colors.num_elements;
+
+  /* TODO: Horrible hack, but adjacent colours are always distinct.
+   * Causes horrible flashing, when mouse is moved, so a static map
+   * would definitely would fix it, but there is no STL in C, so
+   * that would mean extra implementation effort. Leave it for now,
+   * just need to take a screenshot. */
+
+  static size_t count = 0;
+  static uint64_t prior_id = 0;
+
+  uint64_t current_id = (uint64_t) ip->iteration_set;
+
+  if(current_id != prior_id)
+    count = (count + 1) % 2;
+
+  prior_id = current_id;
+
+	return count;
 }
 
 struct am_timeline_render_layer_type*
@@ -414,8 +430,11 @@ static size_t calculate_index_task_period(
 
 	/* Some arbitrary expression with reproducible indexes across for the
 	 * same trace */
-	return ((size_t)tp->interval.start * tp->interval.end) %
-		openmp_colors.num_elements;
+
+  /* TODO: Better expression needed with 8 colours there are too many
+     conflicts, probably prime module would fix it to some extent. */
+
+	return ((size_t)(tp->task_instance)) % (openmp_colors.num_elements - 1);
 }
 
 struct am_timeline_render_layer_type*

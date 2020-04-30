@@ -141,6 +141,8 @@ nobase_include_HEADERS = aftermath/core/ansi_extras.h \
 	aftermath/core/openmp_nest_lock_array.h \
 	aftermath/core/openmp_flush_array.h \
 	aftermath/core/openmp_cancel_array.h \
+	aftermath/core/openmp_loop_array.h \
+	aftermath/core/openmp_loop_chunk_array.h \
 	aftermath/core/openstream_task_instance_array.h \
 	aftermath/core/openstream_task_period_array.h \
 	aftermath/core/openstream_task_type_array.h \

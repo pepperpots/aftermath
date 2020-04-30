@@ -58,6 +58,8 @@
 #include <aftermath/core/openmp_nest_lock_array.h>
 #include <aftermath/core/openmp_flush_array.h>
 #include <aftermath/core/openmp_cancel_array.h>
+#include <aftermath/core/openmp_loop_array.h>
+#include <aftermath/core/openmp_loop_chunk_array.h>
 
 #include <aftermath/core/tensorflow_node_array.h>
 #include <aftermath/core/tensorflow_node_execution_array.h>
@@ -113,6 +115,8 @@ AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_openmp_mutex_acquired_array)
 AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_openmp_nest_lock_array)
 AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_openmp_flush_array)
 AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_openmp_cancel_array)
+AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_openmp_loop_array)
+AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_openmp_loop_chunk_array)
 
 AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_tensorflow_node_array)
 AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_tensorflow_node_execution_array)
@@ -195,6 +199,10 @@ int am_build_default_trace_array_registry(struct am_array_registry* r)
 					      "am::openmp::nest_lock") ||
 	   AM_DEFAULT_ARRAY_REGISTRY_REGISTER(r, am_openmp_flush_array,
 					      "am::openmp::flush") ||
+	   AM_DEFAULT_ARRAY_REGISTRY_REGISTER(r, am_openmp_loop_array,
+					      "am::openmp::loop") ||
+	   AM_DEFAULT_ARRAY_REGISTRY_REGISTER(r, am_openmp_loop_chunk_array,
+					      "am::openmp::loop_chunk") ||
 	   AM_DEFAULT_ARRAY_REGISTRY_REGISTER(r, am_openmp_cancel_array,
 					      "am::openmp::cancel") ||
 	   AM_DEFAULT_ARRAY_REGISTRY_REGISTER(r, am_tensorflow_node_array,

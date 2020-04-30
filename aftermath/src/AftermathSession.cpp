@@ -33,7 +33,9 @@
 #include "gui/widgets/TimelineWidget.h"
 #include "gui/widgets/ToolbarButton.h"
 
+#include <map>
 #include <sstream>
+#include <stack>
 #include <QLabel>
 
 extern "C" {
@@ -48,6 +50,374 @@ extern "C" {
 	#include <aftermath/core/io_error.h>
 	#include <aftermath/core/on_disk.h>
 	#include <aftermath/core/parse_status.h>
+  #include <aftermath/core/openmp_task_period_array.h>
+  #include <aftermath/core/openmp_task_type_array.h>
+  #include <aftermath/core/openmp_task_instance_array.h>
+  #include <aftermath/core/openmp_for_loop_type_array.h>
+  #include <aftermath/core/openmp_for_loop_instance_array.h>
+  #include <aftermath/core/openmp_iteration_set_array.h>
+  #include <aftermath/core/openmp_iteration_period_array.h>
+}
+
+/* TODO: Temporary processing function for loop/task types, instances, set,
+   periods */
+void processTrace(am_trace* trace)
+{
+  am_event_collection_array ecs = trace->event_collections;
+
+  // Per trace arrays
+  am_openmp_task_type_array* task_types =
+    (am_openmp_task_type_array*)malloc(sizeof(am_openmp_task_type_array));
+  am_openmp_task_type_array_init(task_types);
+
+  am_openmp_task_instance_array* task_instances =
+    (am_openmp_task_instance_array*)malloc(sizeof(am_openmp_task_instance_array));
+  am_openmp_task_instance_array_init(task_instances);
+
+  am_openmp_for_loop_type_array* for_loop_types =
+    (am_openmp_for_loop_type_array*)malloc(sizeof(am_openmp_for_loop_type_array));
+  am_openmp_for_loop_type_array_init(for_loop_types);
+
+  am_openmp_for_loop_instance_array* for_loop_instances =
+    (am_openmp_for_loop_instance_array*)malloc(sizeof(am_openmp_for_loop_instance_array));
+  am_openmp_for_loop_instance_array_init(for_loop_instances);
+
+  am_openmp_iteration_set_array* iteration_sets =
+    (am_openmp_iteration_set_array*)malloc(sizeof(am_openmp_iteration_set_array));
+  am_openmp_iteration_set_array_init(iteration_sets);
+
+  std::map<uint64_t, am_openmp_task_type*> task_type_map;
+  std::map<uint64_t, am_openmp_task_instance*> task_instance_map;
+
+  std::map<uint64_t, am_openmp_for_loop_type*> for_loop_type_map;
+  std::map<uint64_t, am_openmp_for_loop_instance*> for_loop_instance_map;
+  std::map<std::pair<uint64_t, std::pair<int64_t, int64_t>>, am_openmp_iteration_set*> iter_set_map;
+
+  // We first lift per trace types
+  // For each event collection
+  for(unsigned i = 0; i < ecs.num_elements; i++)
+  {
+    am_array_collection ac = ecs.elements[i].event_arrays;
+
+    // For each event type
+    for(unsigned j = 0; j < ac.num_elements; j++)
+    {
+      am_array_collection_entry ace = ac.elements[j];
+
+      // Tasks
+      if(strcmp("am::openmp::task_create", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_openmp_task_create* events =
+          (am_openmp_task_create*) array->elements;
+
+        // Per each event
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+          uint64_t codeptr_ra = events[k].codeptr_ra;
+
+          // Unknown type so add it
+          if(task_type_map.count(codeptr_ra) == 0)
+          {
+            am_openmp_task_type* new_type =
+              (am_openmp_task_type*) malloc(sizeof(am_openmp_task_type));
+
+            char* type_str = (char*) malloc(32);
+            sprintf(type_str, "%lu", codeptr_ra);
+
+            new_type->name = type_str;
+            new_type->source = {NULL, 0, 0};
+
+            task_type_map.emplace(codeptr_ra, new_type);
+
+            am_openmp_task_type_array_appendp(task_types, new_type);
+          }
+
+          // And now create a new instance
+          uint64_t task_id = events[k].new_task_id;
+
+          am_openmp_task_instance* new_instance =
+              (am_openmp_task_instance*)malloc(sizeof(am_openmp_task_instance));
+
+          am_openmp_task_type* tt = task_type_map.at(codeptr_ra);
+
+          new_instance->task_type = tt;
+
+          task_instance_map.emplace(task_id, new_instance);
+
+          am_openmp_task_instance_array_appendp(task_instances, new_instance);
+        }
+      }
+
+      // Loops
+      if(strcmp("am::openmp::loop", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_openmp_loop* events =
+          (am_openmp_loop*) array->elements;
+
+        // Per each event
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+          uint64_t codeptr_ra = events[k].codeptr_ra;
+
+          // Unknown type so add it
+          if(for_loop_type_map.count(codeptr_ra) == 0)
+          {
+            am_openmp_for_loop_type* new_type =
+              (am_openmp_for_loop_type*) malloc(sizeof(am_openmp_for_loop_type));
+
+            char* type_str = (char*) malloc(32);
+            sprintf(type_str, "%lu", codeptr_ra);
+
+            new_type->source = {type_str, 0, 0};
+
+            for_loop_type_map.emplace(codeptr_ra, new_type);
+
+            am_openmp_for_loop_type_array_appendp(for_loop_types, new_type);
+          }
+
+          // And now create a new instance
+          uint64_t loop_id = events[k].instance_id;
+
+          am_openmp_for_loop_instance* new_instance =
+              (am_openmp_for_loop_instance*)malloc(sizeof(am_openmp_for_loop_instance));
+
+          am_openmp_for_loop_type* lt = for_loop_type_map.at(codeptr_ra);
+
+          new_instance->loop_type = lt;
+          new_instance->lower_bound = events[k].lower_bound;
+          new_instance->upper_bound = events[k].upper_bound;
+          new_instance->num_workers = events[k].num_workers;
+
+          for_loop_instance_map.emplace(loop_id, new_instance);
+
+          am_openmp_for_loop_instance_array_appendp(for_loop_instances, new_instance);
+        }
+      }
+    }
+  }
+
+  am_array_collection global_ac = trace->trace_arrays;
+
+  if(task_types->num_elements > 0)
+  {
+    am_array_collection_add(&global_ac, (am_typed_array_generic*) task_types,
+      "am::opemp::task_type");
+
+    am_array_collection_add(&global_ac, (am_typed_array_generic*) task_instances,
+      "am::opemp::task_instance");
+  }
+
+  if(for_loop_types->num_elements > 0)
+  {
+    am_array_collection_add(&global_ac, (am_typed_array_generic*) for_loop_types,
+      "am::opemp::for_loop_type");
+
+    am_array_collection_add(&global_ac, (am_typed_array_generic*) for_loop_instances,
+      "am::opemp::for_loop_instance");
+  }
+
+  // Then we lift per event collection types
+  // For each event collection
+  for(unsigned i = 0; i < ecs.num_elements; i++)
+  {
+    am_array_collection ac = ecs.elements[i].event_arrays;
+
+    // Per event collection arrays
+    am_openmp_task_period_array* task_periods =
+      (am_openmp_task_period_array*)malloc(sizeof(am_openmp_task_period_array));
+    am_openmp_task_period_array_init(task_periods);
+
+    am_openmp_iteration_period_array* iteration_periods =
+      (am_openmp_iteration_period_array*)malloc(sizeof(am_openmp_iteration_period_array));
+    am_openmp_iteration_period_array_init(iteration_periods);
+
+    // For each event type
+    for(unsigned j = 0; j < ac.num_elements; j++)
+    {
+      am_array_collection_entry ace = ac.elements[j];
+
+      // Tasks
+      if(strcmp("am::openmp::task_schedule", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_openmp_task_schedule* events =
+          (am_openmp_task_schedule*) array->elements;
+
+        am_timestamp_t prior_timestamp = events[0].timestamp;
+
+        // For each event
+        for(unsigned k = 1; k < array->num_elements; k++)
+        {
+          am_timestamp_t new_timestamp = events[k].timestamp;
+
+          uint64_t task_id = events[k].prior_task_id;
+
+          // Only add period if there was a task running
+          if(task_id != 0)
+          {
+            // TODO: Temporary hack, we need to handle case when the
+            // task is tied to loop (see BOTS)
+            am_openmp_task_instance* ti = NULL;
+            if(task_instance_map.count(task_id) != 0)
+              ti = task_instance_map.at(task_id);
+
+            am_openmp_task_period* new_period =
+              (am_openmp_task_period*) malloc(sizeof(am_openmp_task_period));
+
+            new_period->task_instance = ti;
+            new_period->interval = {prior_timestamp, new_timestamp};
+
+            am_openmp_task_period_array_appendp(task_periods, new_period);
+          }
+
+          prior_timestamp = new_timestamp;
+        }
+      }
+
+      // Loops
+      if(strcmp("am::openmp::loop_chunk", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_openmp_loop_chunk* events =
+          (am_openmp_loop_chunk*) array->elements;
+
+        uint64_t inst_id = 0;
+        int64_t lb = 0;
+        int64_t ub = 0;
+        bool last = 0;
+        am_timestamp_t timestamp = 0;
+
+        std::stack<std::pair<uint64_t, std::pair<int64_t, int64_t>>> bounds;
+
+        // For each event
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+          // Try to close current period
+          if(timestamp != 0 && bounds.size() > 0)
+          {
+            // If last we pop nest level from stack
+            if(events[k].is_last)
+            {
+              auto bound = bounds.top();
+              bounds.pop();
+
+              // If previous was also last we need to recover bounds
+              // of the current level
+              if(last)
+              {
+                inst_id = bound.first;
+                lb = bound.second.first;
+                ub = bound.second.second;
+              }
+            }
+            // If the previous node was last, but current is no last, we
+            // have consecutive iterations on the same nest level,
+            // use iteration from level above for this period. 
+            else if(last)
+            {
+              // We don't leave nest so don't pop
+              auto bound = bounds.top();
+              inst_id = bound.first;
+              lb = bound.second.first;
+              ub = bound.second.second;
+            }
+
+            // Ignore cases when lb > ub, as loop did no useful for
+            // (just was initialized).
+            if(lb <= ub)
+            {
+              am_openmp_iteration_set* is = iter_set_map.at({inst_id, {lb, ub}});
+
+              am_openmp_iteration_period* new_period =
+                (am_openmp_iteration_period*) malloc(sizeof(am_openmp_iteration_period));
+
+              new_period->iteration_set = is;
+              new_period->interval = {timestamp, events[k].timestamp};
+
+              am_openmp_iteration_period_array_appendp(iteration_periods, new_period);
+            }
+          }
+
+          // New instance so nest level increases
+          if(!events[k].is_last && inst_id != events[k].instance_id)
+          {
+            bounds.push({events[k].instance_id, {events[k].lower_bound, events[k].upper_bound}});
+          }
+
+          inst_id = events[k].instance_id;
+          lb = events[k].lower_bound;
+          ub = events[k].upper_bound;
+          last = events[k].is_last;
+          timestamp = events[k].timestamp;
+
+          // Iteration set not created yet and it is not the marker
+          // event.
+          if(!last && lb <= ub && iter_set_map.count({inst_id, {lb, ub}}) == 0)
+          {
+             am_openmp_iteration_set* new_set =
+              (am_openmp_iteration_set*) malloc(sizeof(am_openmp_iteration_set));
+
+            new_set->loop_instance = for_loop_instance_map.at(inst_id);
+            new_set->lower_bound = lb;
+            new_set->upper_bound = ub;
+
+            iter_set_map.emplace(std::make_pair(inst_id, std::make_pair(lb, ub)), new_set);
+
+            am_openmp_iteration_set_array_appendp(iteration_sets, new_set);
+          }
+        }
+      }
+    }
+
+    if(task_periods->num_elements > 0)
+    {
+      am_array_collection_add(&ac, (am_typed_array_generic*) task_periods,
+        "am::openmp::task_period");
+    }
+
+    if(iteration_periods->num_elements > 0)
+    {
+      am_array_collection_add(&ac, (am_typed_array_generic*) iteration_periods,
+        "am::openmp::iteration_period");
+    }
+  }
+
+  if(iteration_sets->num_elements > 0)
+  {
+    am_array_collection_add(&global_ac, (am_typed_array_generic*) iteration_sets,
+      "am::openmp::iteration_set");
+  }
+
+  // Some debug printing
+/*  for(unsigned i = 0; i < ecs.num_elements; i++)
+  {
+    am_array_collection ac = ecs.elements[i].event_arrays;
+
+    for(unsigned j = 0; j < ac.num_elements; j++)
+    {
+      am_array_collection_entry ace = ac.elements[j];
+
+      if(strcmp(ace.type, "am::openmp::iteration_period") == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_openmp_iteration_period* ip = (am_openmp_iteration_period*) array->elements;
+
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+          printf("%lu\n", ip[k].iteration_set->lower_bound);
+        }
+      }
+    }
+  }*/
+
+//  exit(0);
 }
 
 AftermathSession::AftermathSession() :
@@ -278,6 +648,12 @@ void AftermathSession::loadTrace(const char* filename)
 
 	am_io_context_destroy(&ioctx);
 	am_frame_type_registry_destroy(&frame_types);
+
+  /* NO-body expects the Spanish Inquisition! */
+  /* TODO: Temporary hack to create Aftermath types from
+     raw OMPT data */
+  processTrace(trace);
+
 	this->setTrace(trace);
 }
 
