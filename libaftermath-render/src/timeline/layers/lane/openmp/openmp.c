@@ -284,7 +284,7 @@ static size_t calculate_index_iteration_period(
   uint64_t current_id = (uint64_t) ip->iteration_set;
 
   if(current_id != prior_id)
-    count = (count + 1) % 2;
+    count = (count + 1) % 4;
 
   prior_id = current_id;
 

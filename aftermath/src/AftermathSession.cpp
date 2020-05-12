@@ -420,8 +420,8 @@ void processTrace(am_trace* trace)
 //  exit(0);
 }
 
-AftermathSession::AftermathSession() :
-	trace(NULL)
+AftermathSession::AftermathSession()
+//	trace(NULL)
 {
 	this->dfg.graph = NULL;
 	this->dfg.coordinate_mapping = NULL;
@@ -476,9 +476,14 @@ void AftermathSession::cleanup()
 {
 	am_timeline_render_layer_type_registry_destroy(&this->rltr);
 
-	if(this->trace) {
-		am_trace_destroy(this->trace);
-		free(this->trace);
+	if(this->trace[0]) {
+		am_trace_destroy(this->trace[0]);
+		free(this->trace[0]);
+	}
+
+	if(this->trace[1]) {
+		am_trace_destroy(this->trace[1]);
+		free(this->trace[1]);
 	}
 
 	if(this->dfg.graph) {
@@ -514,9 +519,9 @@ struct am_dfg_node_type_registry* AftermathSession::getDFGNodeTypeRegistry()
 	return &this->dfg.node_type_registry;
 }
 
-struct am_trace* AftermathSession::getTrace() noexcept
+struct am_trace* AftermathSession::getTrace(unsigned id) noexcept
 {
-	return this->trace;
+	return this->trace[id];
 }
 
 struct am_timeline_render_layer_type_registry*
@@ -525,9 +530,9 @@ AftermathSession::getRenderLayerTypeRegistry() noexcept
 	return &this->rltr;
 }
 
-void AftermathSession::setTrace(struct am_trace* t) noexcept
+void AftermathSession::setTrace(struct am_trace* t, unsigned id) noexcept
 {
-	this->trace = t;
+	this->trace[id] = t;
 }
 
 struct am_dfg_graph* AftermathSession::getDFG() noexcept
@@ -607,7 +612,7 @@ static void errorStackToString(struct am_io_error_stack* s, std::string& msg)
  *
  * Throws an exception on error.
  */
-void AftermathSession::loadTrace(const char* filename)
+void AftermathSession::loadTrace(const char* filename, unsigned id)
 {
 	struct am_trace* trace;
 	struct am_io_context ioctx;
@@ -652,9 +657,9 @@ void AftermathSession::loadTrace(const char* filename)
   /* NO-body expects the Spanish Inquisition! */
   /* TODO: Temporary hack to create Aftermath types from
      raw OMPT data */
-  processTrace(trace);
+  //processTrace(trace);
 
-	this->setTrace(trace);
+	this->setTrace(trace, id);
 }
 
 /* Loads a DFG graph from the specified location. */
@@ -845,7 +850,8 @@ int AftermathSession::DFGNodeInstantiationCallback(
 	} else if(strcmp(n->type->name, "am::core::trace") == 0) {
 		struct am_dfg_node_trace* t = (typeof(t))n;
 
-		t->trace = session->getTrace();
+		t->trace = session->getTrace(0);
+    t->aux_trace = session->getTrace(1);
 	}
 
 	return 0;

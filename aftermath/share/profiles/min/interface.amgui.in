@@ -8,57 +8,85 @@ am_gui {
 					children: [
 						amgui_toolbar_togglebutton {
 							tooltip: "Draw reads",
-							icon: "@ICON_BASEDIR@/draw_states.svg",
-							checked: 1u64,
+							icon: "/home/iwodiany/Projects/aftermath/install/share/aftermath/icons/draw_states.svg",
+							checked: 0u64,
 							id: "toolbutton_draw_states"
 						},
-					]
-				},
-
-				amgui_hsplitter {
-					stretch: [10u64, 90u64],
-					children: [
-						amgui_tabs {
-							tab_names: [ "Options" ],
-
-							children : [
-								amgui_vbox {
-									children: [
-										amgui_label {
-											text: "Hierarchy:"
-										},
-
-										amgui_hierarchy_combobox {
-											id: "hierarchy_cb1"
-										}
-									]
-								}
-							]
+						amgui_toolbar_togglebutton {
+							tooltip: "Draw iteration period",
+							icon: "/home/iwodiany/Projects/aftermath/install/share/aftermath/icons/draw_openmp_iteration_periods.svg",
+							checked: 0u64,
+							id: "toolbutton_draw_iteration_periods"
 						},
-
-						amgui_tabs {
-							tab_names: [ "Timeline", "DFG" ],
-
-							children : [
-								amgui_timeline {
-									id: "tl1",
-									layers: ["background", "hierarchy", "axes", "state", "selection"]
-								},
-
-								amgui_dfg { }
-							]
-						}
 					]
 				},
 
-				amgui_statusbar {
-					children: [
-						amgui_label {
-							text: "Ready.",
-							id: "statusbar_label"
-						}
-					]
-				}
+        amgui_tabs {
+          tab_names: [ "timeline", "dfg" ],
+
+          children : [
+            amgui_vsplitter {
+              stretch: [50u64, 50u64],
+              children: [
+
+                amgui_hsplitter {
+                  stretch: [10u64, 90u64],
+                  children: [
+                    amgui_vbox {
+                      children: [
+                        amgui_label {
+                          text: "hierarchy:"
+                        },
+
+                        amgui_hierarchy_combobox {
+                          id: "hierarchy_cb1"
+                        }
+                      ]
+                    },
+
+                    amgui_timeline {
+                      id: "tl1",
+                      layers: ["background", "hierarchy", "axes", "state", "selection", "openmp::iteration_period"]
+                    },
+                  ]
+                },
+
+                amgui_hsplitter {
+                  stretch: [10u64, 90u64],
+                  children: [
+                    amgui_vbox {
+                      children: [
+                        amgui_label {
+                          text: "hierarchy:"
+                        },
+
+                        amgui_hierarchy_combobox {
+                          id: "hierarchy_cb2"
+                        }
+                      ]
+                    },
+
+                    amgui_timeline {
+                      id: "tl2",
+                      layers: ["background", "hierarchy", "axes", "state", "selection", "openmp::iteration_period"]
+                    }
+                  ]
+                }
+              ]
+            },
+
+          amgui_dfg { }
+        ]
+      },
+
+      amgui_statusbar {
+        children: [
+          amgui_label {
+            text: "Ready.",
+            id: "statusbar_label"
+          }
+				]
+			}
 			]
 		}
 	]

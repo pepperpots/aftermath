@@ -39,6 +39,7 @@ struct am_options {
 	public:
 		std::string profile_name;
 		std::string trace_filename;
+    std::string trace_filename_2;
 		std::string dfg_filename;
 		std::string ui_filename;
 		bool print_usage;
@@ -69,7 +70,7 @@ static void parse_options(struct am_options* o, int argc, char** argv)
 	int opt;
 
 	/* Default values */
-	o->trace_filename = "";
+	o->trace_filename = ""; 
 	o->dfg_filename = "";
 	o->ui_filename = "";
 	o->print_usage = false;
@@ -105,6 +106,11 @@ static void parse_options(struct am_options* o, int argc, char** argv)
 
 	if(argc > 0 && optind < argc) {
 		o->trace_filename = argv[optind];
+		optind++;
+	}
+
+	if(argc > 0 && optind < argc) {
+		o->trace_filename_2 = argv[optind];
 		optind++;
 	}
 
@@ -160,7 +166,8 @@ int aftermath_main(const struct am_options* o,
 		QShortcut guiManagerShortcut(QKeySequence(Qt::Key_F12),
 					     &mainWindow);
 
-		session.loadTrace(o->trace_filename.c_str());
+		session.loadTrace(o->trace_filename.c_str(), 0);
+		session.loadTrace(o->trace_filename_2.c_str(), 1);
 		factory.buildGUI(&gui, o->ui_filename.c_str());
 		session.loadDFG(o->dfg_filename.c_str());
 

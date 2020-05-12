@@ -84,11 +84,11 @@ class AftermathSession {
 
 		struct am_dfg_type_registry* getDFGTypeRegistry() noexcept;
 		struct am_dfg_node_type_registry* getDFGNodeTypeRegistry() noexcept;
-		struct am_trace* getTrace() noexcept;
+		struct am_trace* getTrace(unsigned id) noexcept;
 		struct am_dfg_graph* getDFG() noexcept;
 		struct am_dfg_coordinate_mapping* getDFGCoordinateMapping() noexcept;
 
-		void setTrace(struct am_trace* t) noexcept;
+		void setTrace(struct am_trace* t, unsigned id) noexcept;
 		void setDFG(struct am_dfg_graph* g) noexcept;
 		void setDFGCoordinateMapping(struct am_dfg_coordinate_mapping* m) noexcept;
 		void scheduleDFG();
@@ -100,7 +100,7 @@ class AftermathSession {
 		DFGQTProcessor& getDFGProcessor();
 		DFGQTProcessor* getDFGProcessorp();
 
-		void loadTrace(const char* filename);
+		void loadTrace(const char* filename, unsigned id);
 		void loadDFG(const char* filename);
 
 	protected:
@@ -113,7 +113,7 @@ class AftermathSession {
 			struct am_dfg_coordinate_mapping* coordinate_mapping;
 		} dfg;
 
-		struct am_trace* trace;
+		struct am_trace* trace[2];
 		struct am_timeline_render_layer_type_registry rltr;
 
 		AftermathGUI gui;

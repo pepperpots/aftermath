@@ -6,7 +6,7 @@ am_dfg_graph {
 		am::gui::timeline {
 				id: 2u64,
 				timeline_id: "tl1"
-			},
+    },
 		am::gui::hierarchy_combobox {
 				id: 3u64,
 				widget_id: "hierarchy_cb1"
@@ -52,8 +52,38 @@ am_dfg_graph {
 		am::core::string_concat {
 				id: 16u64,
 				separator: ", "
-			}
-		],
+			},
+		am::gui::timeline {
+				id: 17u64,
+				timeline_id: "tl2"
+    },
+		am::gui::hierarchy_combobox {
+				id: 18u64,
+				widget_id: "hierarchy_cb2"
+		},
+		am::render::timeline::layer::state::configuration {
+				id: 19u64
+		},
+		am::render::timeline::layer::state::filter {
+				id: 20u64
+		},
+		am::gui::toolbar_togglebutton {
+				id: 21u64,
+				widget_id: "toolbutton_draw_iteration_periods"
+		},
+		am::render::timeline::layer::openmp::iteration_period::configuration {
+				id: 22u64
+		},
+		am::render::timeline::layer::openmp::iteration_period::filter {
+				id: 23u64
+		},
+		am::render::timeline::layer::openmp::iteration_period::configuration {
+				id: 24u64
+		},
+		am::render::timeline::layer::openmp::iteration_period::filter {
+				id: 25u64
+		}
+	],
 	connections: [
 		[1u64, "trace", 2u64, "trace"],
 		[3u64, "hierarchy", 2u64, "hierarchy"],
@@ -71,7 +101,19 @@ am_dfg_graph {
 		[13u64, "name", 14u64, "in"],
 		[7u64, "out", 15u64, "in0"],
 		[14u64, "out", 15u64, "in1"],
-		[15u64, "out", 16u64, "in"]
+		[15u64, "out", 16u64, "in"],
+		[1u64, "aux_trace", 17u64, "trace"],
+		[18u64, "hierarchy", 17u64, "hierarchy"],
+		[1u64, "aux_trace", 18u64, "trace"],
+  	[10u64, "toggled", 19u64, "enable"],
+		[17u64, "layers", 20u64, "in"],
+		[20u64, "out", 19u64, "layer"],
+   	[21u64, "toggled", 22u64, "enable"],
+		[2u64, "layers", 23u64, "in"],
+		[23u64, "out", 22u64, "layer"],
+   	[21u64, "toggled", 24u64, "enable"],
+		[17u64, "layers", 25u64, "in"],
+		[25u64, "out", 24u64, "layer"]
 		],
 	positions: [
 		[1u64, 66.259260, 117.074074],

@@ -104,8 +104,7 @@ static inline void am_dfg_schedule_list_push_front(struct list_head* l,
 }
 
 /* For debugging: Dumps a list of nodes to be scheduled to stdout */
-void am_dfg_schedule_list_dump(struct list_head* l)
-{
+void am_dfg_schedule_list_dump(struct list_head* l) {
 	struct am_dfg_node* n;
 
 	printf("Scheduling list %p:\n", l);
@@ -482,6 +481,8 @@ int am_dfg_schedule_graph(const struct am_dfg_graph* g)
 {
 	struct am_dfg_node* n;
 	struct list_head sched_list = LIST_HEAD_INIT(sched_list);
+
+  am_dfg_schedule_list_dump(&sched_list);
 
 	am_dfg_schedule_reset_graph(g);
 
