@@ -402,6 +402,59 @@ am_dsk_hierarchy_description.addTag(tags.process.ProcessFunction())
 
 ################################################################################
 
+am_dsk_function_symbol = Frame(
+    name = "am_dsk_function_symbol",
+    entity = "on-disk function symbol",
+    comment = "A function symbol, as declared in the program's symbol table",
+
+    fields = FieldList([
+        Field(
+            name = "addr",
+            field_type = aftermath.types.on_disk.am_dsk_source_location,
+            comment = "Memory address of the symbol"),
+        Field(
+            name = "name",
+            field_type = aftermath.types.on_disk.am_dsk_string,
+            comment = "Name of the symbol")]))
+
+tags.dsk.tomem.add_per_trace_array_tags(
+    am_dsk_function_symbol,
+    aftermath.types.openmp.in_memory.am_function_symbol)
+
+################################################################################
+
+am_dsk_stack_frame = EventFrame(
+    name = "am_dsk_stack_frame",
+    entity = "on-disk stack frame",
+    comment = "A stack frame within the function call graph (encapsulates a 
+			period during which the function at address 'addr' was on the stack)",
+
+    fields = FieldList([
+        Field(
+            name = "addr",
+            field_type = aftermath.types.on_disk.am_dsk_source_location,
+            comment = "Memory address of the called function in symbol table"),
+        Field(
+            name = "interval",
+            field_type = aftermath.types.on_disk.am_dsk_interval,
+            comment = "Execution interval while frame was on stack")]))
+
+# stack frames are enumerable per CPU
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_stack_frame,
+    aftermath.types.in_memory.am_stack_frame,
+    "collection_id")
+
+# associate stack frame to symbol
+relations.join.make_join(
+    dsk_src_field = am_dsk_stack_frame.getFields().getFieldByName("addr"),
+    dsk_target_field = am_dsk_function_symbol.getFields().getFieldByName("addr"),
+    mem_ptr_field = aftermath.types.in_memory.am_stack_frame.getFields().getFieldByName("function_symbol"),
+    mem_target_type = aftermath.types.in_memory.am_function_symbol,
+    null_allowed = False)
+
+################################################################################
+
 all_types = TypeList([
     am_dsk_interval,
     am_dsk_string,
@@ -416,7 +469,9 @@ all_types = TypeList([
     am_dsk_state_event,
     am_dsk_counter_description,
     am_dsk_event_mapping,
-    am_dsk_hierarchy_description
+    am_dsk_hierarchy_description,
+		am_dsk_function_symbol,
+		am_dsk_stack_frame
 ])
 
 aftermath.config.addDskTypes(*all_types)

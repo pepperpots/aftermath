@@ -205,13 +205,84 @@ am_source_location = InMemoryCompoundType(
 
 #################################################################################
 
+am_function_symbol = InMemoryCompoundType(
+    name = "am_function_symbol",
+    entity = "function symbol",
+    comment = "A function symbol, as declared in the program's symbol table",
+    ident = "am::function_symbol",
+
+    fields = FieldList([
+        Field(
+            name = "addr",
+            field_type = aftermath.types.builtin.uint64_t,
+            comment = "Memory address of the symbol"),
+        Field(
+            name = "name",
+            field_type = aftermath.types.base.am_string,
+            comment = "Name of the symbol")]))
+
+################################################################################
+
+am_stack_frame = InMemoryCompoundType(
+    name = "am_stack_frame",
+    entity = "Stack frame",
+    comment = "A stack frame within the function call graph",
+    ident = "am::stack_frame",
+
+    fields = FieldList([
+        Field(
+            name = "function_symbol",
+            field_type = am_function_symbol,
+            is_pointer = True,
+						is_owened = False,
+            comment = "What function from the symbol table did this stack " + \
+						"frame execute"),
+        Field(
+            name = "interval",
+            field_type = am_interval,
+            comment = "Interval during which the state was active")
+				]))
+
+am_stack_frame.getFields().prependFields([
+		Field(
+				name = "parent_frame",
+				field_type = am_stack_frame,
+				is_pointer = True,
+				is_owned = False,
+				comment = "The stack frame immediately below this on the stack"),
+		Field(
+				name = "num_child_frames",
+				field_type = aftermath.types.builtin.size_t,
+				comment = "Number of entries in the child_frames array (how " + \
+				"many instrumented function calls did this frame make)"),
+		Field(
+				name = "child_frames",
+				field_type = am_stack_frame,
+				is_pointer = True,
+				# Not owned, as we want to access these stack frames independently
+				is_owned = False, 
+				is_array = True,
+				array_num_elements_field_name = "num_child_frames",
+				comment = "Frames pushed immediately above this on the stack")])
+
+am_stack_frame.addTag(
+    aftermath.tags.GenerateDefaultConstructor(field_values = [
+        ("parent_frame", "NULL"),
+        ("num_child_frames", "0"),
+        ("child_frames", "NULL")
+    ]))
+
+################################################################################
+
 toplevel_types = TypeList([
     am_counter_event,
     am_measurement_interval,
     am_counter_description,
     am_state_description,
     am_state_event,
-    am_source_location
+    am_source_location,
+		am_function_symbol,
+		am_stack_frame
 ])
 
 aux_types = TypeList([
