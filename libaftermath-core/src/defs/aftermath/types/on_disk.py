@@ -410,33 +410,33 @@ am_dsk_function_symbol = Frame(
     fields = FieldList([
         Field(
             name = "addr",
-            field_type = aftermath.types.on_disk.am_dsk_source_location,
+            field_type = aftermath.types.builtin.uint64_t,
             comment = "Memory address of the symbol"),
         Field(
             name = "name",
-            field_type = aftermath.types.on_disk.am_dsk_string,
+            field_type = am_dsk_string,
             comment = "Name of the symbol")]))
 
 tags.dsk.tomem.add_per_trace_array_tags(
     am_dsk_function_symbol,
-    aftermath.types.openmp.in_memory.am_function_symbol)
+    aftermath.types.in_memory.am_function_symbol)
 
 ################################################################################
 
 am_dsk_stack_frame = EventFrame(
     name = "am_dsk_stack_frame",
     entity = "on-disk stack frame",
-    comment = "A stack frame within the function call graph (encapsulates a 
-			period during which the function at address 'addr' was on the stack)",
+    comment = "A stack frame within the function call graph (encapsulates a" + \
+			" period during which the function at address 'addr' was on the stack)",
 
     fields = FieldList([
         Field(
             name = "addr",
-            field_type = aftermath.types.on_disk.am_dsk_source_location,
+            field_type = aftermath.types.builtin.uint64_t,
             comment = "Memory address of the called function in symbol table"),
         Field(
             name = "interval",
-            field_type = aftermath.types.on_disk.am_dsk_interval,
+            field_type = am_dsk_interval,
             comment = "Execution interval while frame was on stack")]))
 
 # stack frames are enumerable per CPU

@@ -100,6 +100,8 @@ nobase_include_HEADERS = aftermath/core/ansi_extras.h \
 	aftermath/core/indexes/recttree.h \
 	aftermath/core/interval.h \
 	aftermath/core/interval_array.h \
+	aftermath/core/stack_frame_array.h \
+	aftermath/core/function_symbol_array.h \
 	aftermath/core/in_memory.h \
 	aftermath/core/in_memory_dfg_node_types.h \
 	aftermath/core/in_memory_dfg_types.h \

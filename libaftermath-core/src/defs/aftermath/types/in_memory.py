@@ -209,7 +209,7 @@ am_function_symbol = InMemoryCompoundType(
     name = "am_function_symbol",
     entity = "function symbol",
     comment = "A function symbol, as declared in the program's symbol table",
-    ident = "am::function_symbol",
+    ident = "am::core::function_symbol",
 
     fields = FieldList([
         Field(
@@ -227,14 +227,14 @@ am_stack_frame = InMemoryCompoundType(
     name = "am_stack_frame",
     entity = "Stack frame",
     comment = "A stack frame within the function call graph",
-    ident = "am::stack_frame",
+    ident = "am::core::stack_frame",
 
     fields = FieldList([
         Field(
             name = "function_symbol",
             field_type = am_function_symbol,
             is_pointer = True,
-						is_owened = False,
+						is_owned = False,
             comment = "What function from the symbol table did this stack " + \
 						"frame execute"),
         Field(

@@ -181,6 +181,8 @@ libaftermath_core_la_SOURCES = src/ansi_extras.c \
 				src/interval.c \
 				src/interval.h \
 				src/interval_array.h \
+				src/stack_frame_array.h \
+				src/function_symbol_array.h \
 				src/in_memory.c \
 				src/in_memory.h \
 				src/in_memory_dfg_node_types.h \
