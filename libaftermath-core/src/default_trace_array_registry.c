@@ -29,6 +29,7 @@
 
 #include <aftermath/core/function_symbol_array.h>
 #include <aftermath/core/stack_frame_array.h>
+#include <aftermath/core/stack_frame_period_array.h>
 
 #include <aftermath/core/openstream_task_type_array.h>
 #include <aftermath/core/openstream_task_instance_array.h>
@@ -87,6 +88,7 @@ AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_measurement_interval_array)
 
 AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_function_symbol_array)
 AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_stack_frame_array)
+AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_stack_frame_period_array)
 
 AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_openstream_task_type_array)
 AM_DECL_DEFAULT_ARRAY_REGISTRY_FUNCTIONS(am_openstream_task_instance_array)
@@ -159,6 +161,8 @@ int am_build_default_trace_array_registry(struct am_array_registry* r)
 					      "am::core::counter_event") ||
 	   AM_DEFAULT_ARRAY_REGISTRY_REGISTER(r, am_stack_frame_array,
 					      "am::core::stack_frame") ||
+	   AM_DEFAULT_ARRAY_REGISTRY_REGISTER(r, am_stack_frame_period_array,
+					      "am::core::stack_frame_period") ||
 	   AM_DEFAULT_ARRAY_REGISTRY_REGISTER(r, am_function_symbol_array,
 					      "am::core::function_symbol") ||
 	   AM_DEFAULT_ARRAY_REGISTRY_REGISTER(r, am_openmp_task_instance_array,

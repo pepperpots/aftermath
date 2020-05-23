@@ -8,13 +8,13 @@ am_gui {
 					children: [
 						amgui_toolbar_togglebutton {
 							tooltip: "Draw reads",
-							icon: "/home/iwodiany/Projects/aftermath/install/share/aftermath/icons/draw_states.svg",
+							icon: "@ICON_BASEDIR@/draw_states.svg",
 							checked: 0u64,
 							id: "toolbutton_draw_states"
 						},
 						amgui_toolbar_togglebutton {
 							tooltip: "Draw iteration period",
-							icon: "/home/iwodiany/Projects/aftermath/install/share/aftermath/icons/draw_openmp_iteration_periods.svg",
+							icon: "@ICON_BASEDIR@/draw_openmp_iteration_periods.svg",
 							checked: 0u64,
 							id: "toolbutton_draw_iteration_periods"
 						},

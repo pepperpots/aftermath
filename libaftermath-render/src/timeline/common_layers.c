@@ -38,6 +38,8 @@ static struct am_timeline_render_layer_type* (*inst_functions[])(void) = {
 	am_timeline_background_layer_instantiate_type,
 	am_timeline_hierarchy_layer_instantiate_type,
 	am_timeline_measurement_intervals_layer_instantiate_type,
+	am_timeline_stack_frame_period_layer_instantiate_type,
+	am_timeline_function_symbol_layer_instantiate_type,
 	am_timeline_openmp_for_loop_type_layer_instantiate_type,
 	am_timeline_openmp_for_loop_instance_layer_instantiate_type,
 	am_timeline_openmp_iteration_set_layer_instantiate_type,

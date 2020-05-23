@@ -23,6 +23,26 @@
 #include <aftermath/render/timeline/renderer.h>
 
 AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	stack_frame_period,
+	"core::stack_frame_period",
+	struct am_timeline_stack_frame_period_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	stack_frame_period,
+	"core::stack_frame_period")
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	function_symbol,
+	"core::function_symbol",
+	struct am_timeline_function_symbol_layer)
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	function_symbol,
+	"core::function_symbol")
+
+/********************/
+
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
 	openmp_for_loop_type,
 	"openmp::for_loop_type",
 	struct am_timeline_openmp_for_loop_type_layer)

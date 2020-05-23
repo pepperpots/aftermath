@@ -161,6 +161,8 @@ STATIC_PROFILE_FILES = \
 
 ICONS = \
 	share/icons/draw_states.svg \
+	share/icons/draw_stack_frames.svg \
+	share/icons/draw_function_symbols.svg \
 	share/icons/draw_openmp_loop_types.svg \
 	share/icons/draw_openmp_loop_instances.svg \
 	share/icons/draw_openmp_iteration_sets.svg \

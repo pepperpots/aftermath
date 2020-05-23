@@ -39,9 +39,10 @@ struct am_options {
 	public:
 		std::string profile_name;
 		std::string trace_filename;
-    std::string trace_filename_2;
+    //std::string trace_filename_2;
 		std::string dfg_filename;
 		std::string ui_filename;
+		std::string binary_filename;
 		bool print_usage;
 		bool dfg_safe_mode;
 };
@@ -51,13 +52,14 @@ static void print_usage(void)
 	std::cout << "Aftermath, a graphical tool for trace-based performance "
 		"analysis of parallel programs.\n"
 		"\n"
-		"  Usage: aftermath [-p profile_path] [-d dfg_file] [-u ui_file] trace_file\n"
+		"  Usage: aftermath [-p profile_path] [-d dfg_file] [-u ui_file] [-b binary_file] trace_file\n"
 		"\n"
 		"  -h             Display this help message.\n"
 		"  -p profile     Load DFG and user interface from the profile with the given\n"
 		"                 name.\n"
 		"  -d dfg_file    Load DFG definition from dfg_file.\n"
 		"  -u ui_file     Load user interface from ui_file.\n"
+		"  -b binary_file Load symbol table from binary file.\n"
 		"  -s             Ignore errors during initial scheduling of DFG.\n";
 }
 
@@ -66,7 +68,7 @@ static void print_usage(void)
  */
 static void parse_options(struct am_options* o, int argc, char** argv)
 {
-	static const char* options_str = "hd:p:su:";
+	static const char* options_str = "hd:p:su:b:";
 	int opt;
 
 	/* Default values */
@@ -75,6 +77,7 @@ static void parse_options(struct am_options* o, int argc, char** argv)
 	o->ui_filename = "";
 	o->print_usage = false;
 	o->profile_name = "";
+	o->binary_filename = "";
 	o->dfg_safe_mode = false;
 
 	opterr = 0;
@@ -93,6 +96,9 @@ static void parse_options(struct am_options* o, int argc, char** argv)
 			case 'u':
 				o->ui_filename = optarg;
 				break;
+			case 'b':
+				o->binary_filename = optarg;
+				break;
 			case 'h':
 				o->print_usage = 1;
 				break;
@@ -109,10 +115,12 @@ static void parse_options(struct am_options* o, int argc, char** argv)
 		optind++;
 	}
 
+	/*
 	if(argc > 0 && optind < argc) {
 		o->trace_filename_2 = argv[optind];
 		optind++;
 	}
+	*/
 
 	if(optind != argc)
 		throw AftermathException("Excess arguments provided.");
@@ -166,8 +174,8 @@ int aftermath_main(const struct am_options* o,
 		QShortcut guiManagerShortcut(QKeySequence(Qt::Key_F12),
 					     &mainWindow);
 
-		session.loadTrace(o->trace_filename.c_str(), 0);
-		session.loadTrace(o->trace_filename_2.c_str(), 1);
+		session.loadTrace(o->trace_filename.c_str(), 0, o->binary_filename.c_str()); // why are we not using std::string?
+		//session.loadTrace(o->trace_filename_2.c_str(), 1, o->binary_filename.c_str());
 		factory.buildGUI(&gui, o->ui_filename.c_str());
 		session.loadDFG(o->dfg_filename.c_str());
 

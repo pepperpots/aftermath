@@ -21,6 +21,12 @@
 #define AM_TIMELINE_LANE_RENDERER_OPENMP_H
 
 struct am_timeline_render_layer_type*
+am_timeline_stack_frame_period_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
+am_timeline_function_symbol_layer_instantiate_type(void);
+
+struct am_timeline_render_layer_type*
 am_timeline_openmp_for_loop_type_layer_instantiate_type(void);
 
 struct am_timeline_render_layer_type*

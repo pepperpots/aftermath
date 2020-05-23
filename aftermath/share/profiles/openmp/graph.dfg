@@ -56,6 +56,26 @@ am_dfg_graph {
 				separator: ", "
 			},
 		am::gui::toolbar_togglebutton {
+				id: 100u64,
+				widget_id: "toolbutton_draw_stack_frame_periods"
+			},
+		am::render::timeline::layer::core::stack_frame_period::filter {
+				id: 95u64
+			},
+		am::render::timeline::layer::core::stack_frame_period::configuration {
+				id: 96u64
+			},
+		am::gui::toolbar_togglebutton {
+				id: 97u64,
+				widget_id: "toolbutton_draw_function_symbols"
+			},
+		am::render::timeline::layer::core::function_symbol::filter {
+				id: 98u64
+			},
+		am::render::timeline::layer::core::function_symbol::configuration {
+				id: 99u64
+			},
+		am::gui::toolbar_togglebutton {
 				id: 17u64,
 				widget_id: "toolbutton_draw_openmp_loop_types"
 			},
@@ -336,6 +356,12 @@ am_dfg_graph {
 		[15u64, "out", 16u64, "in"],
 		[2u64, "layers", 18u64, "in"],
 		[18u64, "out", 19u64, "layer"],
+		[100u64, "toggled", 96u64, "enable"],
+		[2u64, "layers", 95u64, "in"],
+		[95u64, "out", 96u64, "layer"],
+		[97u64, "toggled", 99u64, "enable"],
+		[2u64, "layers", 98u64, "in"],
+		[98u64, "out", 99u64, "layer"],
 		[17u64, "toggled", 19u64, "enable"],
 		[2u64, "layers", 21u64, "in"],
 		[21u64, "out", 22u64, "layer"],
@@ -506,6 +532,12 @@ am_dfg_graph {
 		[91u64, 673.000000, -2600.000000],
 		[92u64, 444.000000, -2754.000000],
 		[93u64, 823.000000, -2754.000000],
-		[94u64, 673.000000, -2700.000000]
+		[94u64, 673.000000, -2700.000000],
+		[100u64, 673.000000, -2800.000000],
+		[95u64, 444.000000, -2954.000000],
+		[96u64, 823.000000, -2954.000000],
+		[97u64, 673.000000, -2900.000000],
+		[98u64, 444.000000, -3054.000000],
+		[99u64, 823.000000, -3054.000000]
 		]
 }

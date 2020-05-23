@@ -1,5 +1,6 @@
 nobase_include_HEADERS = aftermath/render/cairo_extras.h \
 	aftermath/render/color_map.h \
+	aftermath/render/stateful_color_map.h \
 	aftermath/render/dfg/dfg_coordinate_mapping.h \
 	aftermath/render/dfg/nodes/builtin_nodes.h \
 	aftermath/render/dfg/nodes/rgba_constant.h \

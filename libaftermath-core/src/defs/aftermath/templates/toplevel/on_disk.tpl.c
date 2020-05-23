@@ -53,6 +53,9 @@
 #include <aftermath/core/state_description_array.h>
 #include <aftermath/core/state_event_array.h>
 #include <aftermath/core/counter_event_array_collection.h>
+#include <aftermath/core/function_symbol_array.h>
+#include <aftermath/core/stack_frame_array.h>
+#include <aftermath/core/stack_frame_period_array.h>
 
 #include <aftermath/core/telamon_candidate_array.h>
 #include <aftermath/core/telamon_candidate_expand_action_array.h>

@@ -17,6 +17,7 @@
  */
 
 #include <aftermath/render/timeline/layer.h>
+#include <aftermath/render/stateful_color_map.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -24,6 +25,7 @@ void am_timeline_render_layer_type_registry_init(
 	struct am_timeline_render_layer_type_registry* tr)
 {
 	INIT_LIST_HEAD(&tr->types);
+	am_stateful_color_map_init(&stateful_cm);
 }
 
 /* Adds a new type description to the registry. Ownership for the type

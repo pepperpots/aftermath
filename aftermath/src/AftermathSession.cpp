@@ -34,9 +34,12 @@
 #include "gui/widgets/ToolbarButton.h"
 
 #include <map>
+#include <vector>
 #include <sstream>
 #include <stack>
 #include <QLabel>
+
+#include <iostream>
 
 extern "C" {
 	#include <aftermath/render/timeline/common_layers.h>
@@ -57,11 +60,317 @@ extern "C" {
   #include <aftermath/core/openmp_for_loop_instance_array.h>
   #include <aftermath/core/openmp_iteration_set_array.h>
   #include <aftermath/core/openmp_iteration_period_array.h>
+	#include <aftermath/core/function_symbol_array.h>
+	#include <aftermath/core/stack_frame_array.h>
+	#include <aftermath/core/stack_frame_period_array.h>
+}
+
+/* TODO: Temporary chaining of stack frames together by their execution interval */
+void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by_addr)
+{
+
+	/* First go over the frames, associate the correct function symbol and build
+   * vectors for variable-sized parent/child relations
+	 * Then go over the frames again and build the statically sized child arrays
+	 */
+
+  am_event_collection_array ecs = trace->event_collections;
+
+	am_function_symbol_array* function_symbols =
+    (am_function_symbol_array*)malloc(sizeof(am_function_symbol_array));
+  am_function_symbol_array_init(function_symbols);
+	
+  std::map<uint64_t, am_function_symbol*> function_symbol_map; // memory address to function_symbol
+	std::map<uint64_t, size_t> symbol_frame_counts; // memory address to num instantiations
+	std::map<am_stack_frame*, std::vector<am_stack_frame*> > parent_child_relations; // key = parent, value = list of children
+	std::map<am_stack_frame*, std::vector<am_stack_frame_period*> > periods_per_frame;
+
+	/* For each core, iterate over the execution and keep 'current_call_stack' updated
+	 * Use this to build each frame's parent/child relations, and construct stack_frame_periods when the frame was executing at top of stack 
+	 * Also link function symbol (built from binary on trace load) to the addresses of each frame
+	 */
+
+  // For each event collection
+  for(unsigned i = 0; i < ecs.num_elements; i++)
+  {
+
+		//fprintf(stdout, "Processing core %d.\n", i);
+    am_array_collection* ac = &ecs.elements[i].event_arrays;
+	
+		am_stack_frame_period_array* stack_frame_periods =
+			(am_stack_frame_period_array*)malloc(sizeof(am_stack_frame_period_array));
+		am_stack_frame_period_array_init(stack_frame_periods);
+
+    // For each event type
+    for(unsigned j = 0; j < ac->num_elements; j++)
+    {
+      am_array_collection_entry ace = ac->elements[j];
+
+      if(strcmp("am::core::stack_frame", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_stack_frame* events = (am_stack_frame*) array->elements;
+
+				/* I'm not sorting the original events array, but I am going to
+				 * traverse them in sorted order
+			   */
+				am_stack_frame** sf_pointer_array =
+					(am_stack_frame**) malloc(array->num_elements * sizeof(am_stack_frame*));
+        for(unsigned k = 0; k < array->num_elements; k++)
+					sf_pointer_array[k] = &events[k];
+				
+				am_stack_frame_qsort_interval_start_ascending(
+					sf_pointer_array, array->num_elements);
+
+				std::vector<struct am_stack_frame*> current_call_stack;
+
+				uint64_t previous_period_end = 0;
+
+				// Per each frame
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+					//am_stack_frame* frame = &events[k];
+					am_stack_frame* frame = sf_pointer_array[k];
+
+					// allocate its function_symbol and update the symbol count
+          if(function_symbol_map.count(frame->addr) == 0)
+          {
+						std::map<uint64_t, std::string>::iterator sym_iter = symbols_by_addr.find(frame->addr);
+
+						std::string sym_name_str = "unknown";
+						if(symbols_by_addr.size() > 0){
+							if(sym_iter == symbols_by_addr.end()){
+								// if we have symbols, and we don't find a symbol for this address, then fail 
+								std::stringstream errss;
+								errss << "Function with address " << frame->addr << " was not found ";
+								errss << "in the binary.";
+								throw AftermathException(errss.str());
+							} else {
+								sym_name_str = sym_iter->second;
+							}
+						} else {
+							if(sym_iter == symbols_by_addr.end()){
+								// if we do not have symbols, then set all as unknown
+								symbols_by_addr.insert(std::make_pair(frame->addr, sym_name_str));
+							} else {
+								sym_name_str = sym_iter->second;
+							}
+						}
+
+						symbol_frame_counts.insert(std::make_pair(frame->addr, 0));
+            
+						am_function_symbol* new_sym =
+              (am_function_symbol*) malloc(sizeof(am_function_symbol));
+						
+						new_sym->addr = frame->addr;
+						new_sym->name = (char*) malloc(sym_name_str.length()+1);
+						strncpy(new_sym->name, sym_name_str.c_str(), sym_name_str.length());
+						new_sym->name[sym_name_str.length()] = '\0';
+
+						std::cout << "Setting address " << frame->addr << " to " << sym_name_str << std::endl;
+						
+						//new_sym->name = &sym_name_str[0];; // convert the string to non-const char*
+
+            function_symbol_map.emplace(frame->addr, new_sym);
+            am_function_symbol_array_appendp(function_symbols, new_sym);
+          }
+
+					symbol_frame_counts.find(frame->addr)->second++;
+					frame->function_symbol = function_symbol_map.at(frame->addr);
+
+					// roll back up the stack frame checking if we have left any before this one started
+					// we trace periods when they end (either when the frame ends, or when a child starts)
+					// therefore we need to keep track of previous_period_end to serve as the
+					// correct starting timestamp for the next period
+					bool process_exits = true;
+					while(process_exits){
+						if(current_call_stack.size() > 0){
+							am_stack_frame* top_frame = current_call_stack.back();
+
+							// if my parent frame ended, then I need to trace a period between its end and its own parent's end (or my start, if my start is earlier)
+							if(top_frame->interval.end < frame->interval.start){
+								// the top frame finished before I started, so I am at least at the same depth as the current top frame (and will need to recurse further to check if I'm less deep)
+
+								uint64_t period_start = previous_period_end;
+								uint64_t period_end = top_frame->interval.end;
+
+								// add this interval as a period to top_frame
+								struct am_stack_frame_period* ending_period = 
+									(am_stack_frame_period*) malloc(sizeof(am_stack_frame_period));
+								ending_period->stack_frame = top_frame;
+								ending_period->interval = {period_start, period_end};
+
+								auto period_iter = periods_per_frame.find(top_frame);
+								if(period_iter == periods_per_frame.end()){
+									std::vector<am_stack_frame_period*> periods = {ending_period};
+									periods_per_frame.insert(std::make_pair(top_frame, periods));
+								} else {
+									period_iter->second.push_back(ending_period);
+								}
+
+								//fprintf(stdout,"Tracing end period for frame %p with symbol %s from %lu to %lu.\n", top_frame, top_frame->function_symbol->name, period_start, period_end);
+								am_stack_frame_period_array_appendp(stack_frame_periods, ending_period);
+
+								previous_period_end = period_end; // this will then be the starting time for the next period
+								current_call_stack.pop_back();
+
+							} else {
+								// so it didn't finish before I started, meaning I am a child of the parent
+								// I should therefore trace a period from the previous end to my start and add it to the parent
+								
+								uint64_t period_start = previous_period_end;
+								uint64_t period_end = frame->interval.start;
+
+								struct am_stack_frame_period* period_before_start = 
+									(am_stack_frame_period*) malloc(sizeof(am_stack_frame_period));
+								period_before_start->stack_frame = top_frame;
+								period_before_start->interval = {period_start, period_end};
+								
+								auto period_iter = periods_per_frame.find(top_frame);
+								if(period_iter == periods_per_frame.end()){
+									std::vector<am_stack_frame_period*> periods = {period_before_start};
+									periods_per_frame.insert(std::make_pair(top_frame, periods));
+								} else {
+									period_iter->second.push_back(period_before_start);
+								}
+								
+								//fprintf(stdout,"Tracing period (after child start) for frame %p with symbol %s from %lu to %lu.\n", top_frame, top_frame->function_symbol->name, period_start, period_end);
+
+								am_stack_frame_period_array_appendp(stack_frame_periods, period_before_start);
+
+								previous_period_end = period_end;
+
+								process_exits = false;
+							}
+						} else {
+							process_exits = false;
+							previous_period_end = frame->interval.start;
+						}
+					}
+
+					// add the top of the call stack as the parent of this starting frame
+					if(current_call_stack.size() > 0){
+						am_stack_frame* parent_frame = current_call_stack.back();
+
+						// add the parent frame to the newly started frame
+						frame->parent_frame = parent_frame;
+
+						auto it = parent_child_relations.find(parent_frame);
+						if(it == parent_child_relations.end()){
+							std::vector<am_stack_frame*> children = {frame};
+							parent_child_relations.insert(std::make_pair(parent_frame, children));
+						} else {
+							it->second.push_back(frame);
+						}
+
+					}
+					
+					frame->depth = current_call_stack.size() + 1;
+
+					// push the newly started frame to the call stack
+					//fprintf(stdout, "Started new period of frame %p with symbol %s at %lu.\n", frame, frame->function_symbol->name, frame->interval.start);
+					current_call_stack.push_back(frame);
+
+				}
+
+				// now roll back up the call stack and trace the final periods
+				bool process_exits = true;
+				while(process_exits){
+					if(current_call_stack.size() > 0){
+						am_stack_frame* top_frame = current_call_stack.back();
+
+						// there are no more frame starts, so just trace from previous_period_end to the frame's end
+						uint64_t period_start = previous_period_end;
+						uint64_t period_end = top_frame->interval.end;
+
+						// add this interval as a period to top_frame
+						struct am_stack_frame_period* ending_period = 
+							(am_stack_frame_period*) malloc(sizeof(am_stack_frame_period));
+						ending_period->stack_frame = top_frame;
+						ending_period->interval = {period_start, period_end};
+
+						auto period_iter = periods_per_frame.find(top_frame);
+						if(period_iter == periods_per_frame.end()){
+							std::vector<am_stack_frame_period*> periods = {ending_period};
+							periods_per_frame.insert(std::make_pair(top_frame, periods));
+						} else {
+							period_iter->second.push_back(ending_period);
+						}
+						
+						//fprintf(stdout,"Tracing final ending period for frame %p with symbol %s from %lu to %lu.\n", top_frame, top_frame->function_symbol->name, period_start, period_end);
+						
+						am_stack_frame_period_array_appendp(stack_frame_periods, ending_period);
+
+						previous_period_end = period_end;
+						current_call_stack.pop_back();
+
+					} else {
+						process_exits = false;
+					}
+				}
+
+				delete[] sf_pointer_array;
+			}
+		}
+	
+		if(stack_frame_periods->num_elements > 0)
+		{
+      am_array_collection_add(ac, (am_typed_array_generic*) stack_frame_periods,
+        "am::core::stack_frame_period");
+		}
+	
+	}
+
+	std::cout << "Function call breakdown:" << std::endl;
+	for(auto map_iter : symbol_frame_counts)
+		std::cout << map_iter.first << " (" << symbols_by_addr.find(map_iter.first)->second << "):" << map_iter.second << std::endl;
+
+  am_array_collection* global_ac = &trace->trace_arrays;
+
+	if(function_symbols->num_elements > 0)
+  {
+    am_array_collection_add(global_ac, (am_typed_array_generic*) function_symbols,
+      "am::core::function_symbol");
+  }
+
+	// Now build the per-frame child arrays
+	for(auto relation : parent_child_relations){
+
+		am_stack_frame* parent_frame = relation.first;
+		std::vector<am_stack_frame*> child_frames_vec = relation.second;
+
+		// initialise the parent frame's child array
+		parent_frame->child_frames = (am_stack_frame**) malloc(child_frames_vec.size() * sizeof(am_stack_frame*));
+
+		for(decltype(child_frames_vec)::size_type child_idx=0; child_idx<child_frames_vec.size(); child_idx++)
+			parent_frame->child_frames[child_idx] = child_frames_vec.at(child_idx);
+
+		parent_frame->num_child_frames = child_frames_vec.size();
+
+	}
+
+	// Now build the per-frame period arrays
+	for(auto period_iter : periods_per_frame){
+
+		am_stack_frame* frame = period_iter.first;
+		std::vector<am_stack_frame_period*> periods_vec = period_iter.second;
+
+		// initialise the frame's periods array
+		frame->periods = (am_stack_frame_period**) malloc(periods_vec.size() * sizeof(am_stack_frame_period*));
+	
+		for(decltype(periods_vec)::size_type period_idx=0; period_idx<periods_vec.size(); period_idx++)
+			frame->periods[period_idx] = periods_vec.at(period_idx);
+
+		frame->num_periods = periods_vec.size();
+
+	}
+
 }
 
 /* TODO: Temporary processing function for loop/task types, instances, set,
    periods */
-void processTrace(am_trace* trace)
+void processTrace(am_trace* trace, std::map<uint64_t, std::string>& symbols_by_addr)
 {
   am_event_collection_array ecs = trace->event_collections;
 
@@ -85,14 +394,14 @@ void processTrace(am_trace* trace)
   am_openmp_iteration_set_array* iteration_sets =
     (am_openmp_iteration_set_array*)malloc(sizeof(am_openmp_iteration_set_array));
   am_openmp_iteration_set_array_init(iteration_sets);
-
+  
   std::map<uint64_t, am_openmp_task_type*> task_type_map;
   std::map<uint64_t, am_openmp_task_instance*> task_instance_map;
 
   std::map<uint64_t, am_openmp_for_loop_type*> for_loop_type_map;
   std::map<uint64_t, am_openmp_for_loop_instance*> for_loop_instance_map;
   std::map<std::pair<uint64_t, std::pair<int64_t, int64_t>>, am_openmp_iteration_set*> iter_set_map;
-
+				
   // We first lift per trace types
   // For each event collection
   for(unsigned i = 0; i < ecs.num_elements; i++)
@@ -200,26 +509,28 @@ void processTrace(am_trace* trace)
     }
   }
 
-  am_array_collection global_ac = trace->trace_arrays;
+	std::cout << "There were " << task_types->num_elements << " task types." << std::endl;
+
+  am_array_collection* global_ac = &trace->trace_arrays;
 
   if(task_types->num_elements > 0)
   {
-    am_array_collection_add(&global_ac, (am_typed_array_generic*) task_types,
+    am_array_collection_add(global_ac, (am_typed_array_generic*) task_types,
       "am::opemp::task_type");
 
-    am_array_collection_add(&global_ac, (am_typed_array_generic*) task_instances,
+    am_array_collection_add(global_ac, (am_typed_array_generic*) task_instances,
       "am::opemp::task_instance");
   }
 
   if(for_loop_types->num_elements > 0)
   {
-    am_array_collection_add(&global_ac, (am_typed_array_generic*) for_loop_types,
+    am_array_collection_add(global_ac, (am_typed_array_generic*) for_loop_types,
       "am::opemp::for_loop_type");
 
-    am_array_collection_add(&global_ac, (am_typed_array_generic*) for_loop_instances,
+    am_array_collection_add(global_ac, (am_typed_array_generic*) for_loop_instances,
       "am::opemp::for_loop_instance");
   }
-
+  
   // Then we lift per event collection types
   // For each event collection
   for(unsigned i = 0; i < ecs.num_elements; i++)
@@ -234,7 +545,7 @@ void processTrace(am_trace* trace)
     am_openmp_iteration_period_array* iteration_periods =
       (am_openmp_iteration_period_array*)malloc(sizeof(am_openmp_iteration_period_array));
     am_openmp_iteration_period_array_init(iteration_periods);
-
+  
     // For each event type
     for(unsigned j = 0; j < ac.num_elements; j++)
     {
@@ -373,6 +684,7 @@ void processTrace(am_trace* trace)
           }
         }
       }
+
     }
 
     if(task_periods->num_elements > 0)
@@ -386,11 +698,12 @@ void processTrace(am_trace* trace)
       am_array_collection_add(&ac, (am_typed_array_generic*) iteration_periods,
         "am::openmp::iteration_period");
     }
-  }
 
+  }
+	
   if(iteration_sets->num_elements > 0)
   {
-    am_array_collection_add(&global_ac, (am_typed_array_generic*) iteration_sets,
+    am_array_collection_add(global_ac, (am_typed_array_generic*) iteration_sets,
       "am::openmp::iteration_set");
   }
 
@@ -417,7 +730,8 @@ void processTrace(am_trace* trace)
     }
   }*/
 
-//  exit(0);
+	buildCallGraph(trace, symbols_by_addr);
+
 }
 
 AftermathSession::AftermathSession()
@@ -425,6 +739,9 @@ AftermathSession::AftermathSession()
 {
 	this->dfg.graph = NULL;
 	this->dfg.coordinate_mapping = NULL;
+
+	this->trace[0] = NULL;
+	this->trace[1] = NULL;
 
 	am_dfg_type_registry_init(&this->dfg.type_registry,
 				  AM_DFG_TYPE_REGISTRY_DESTROY_TYPES);
@@ -607,12 +924,83 @@ static void errorStackToString(struct am_io_error_stack* s, std::string& msg)
 	}
 }
 
+// TODO these should perhaps be in a separate utility header
+std::vector<std::string> split(const std::string& s, char delim, std::vector<std::string>& elems){
+
+	std::stringstream ss(s);
+	std::string item;
+
+	while (std::getline(ss, item, delim))
+		elems.push_back(item);
+
+	return elems;
+}
+
+std::vector<std::string> split_string_to_vector(const std::string& s, char delim){
+	std::vector<std::string> elems;
+	split(s, delim, elems);
+	return elems;
+}
+
+std::map<uint64_t, std::string> AftermathSession::parseBinarySymbols(const char* binary_filename)
+{
+
+	std::map<uint64_t, std::string> symbols_by_addr;
+
+	std::stringstream ss;
+	ss << R"(sh -c ")";
+	ss << R"(nm -l -td )" << binary_filename;
+	ss << R"( | grep '[0-9A-Fa-f]* [tT]')";
+	ss << R"( | sed -e 's/:/ /g' -e 's/[\t]/ /g' -e 's/[ ]\{1,\}/ /g')";
+	ss << R"(" 2> /dev/null)";
+
+	std::string command = ss.str();
+	
+	char buffer[256];
+	std::string result = "";
+
+	FILE* fp = popen(command.c_str(), "r");
+	if(fp == nullptr)
+		throw AftermathException("Could not parse binary symbols via: " + command);
+
+	while(!feof(fp)){
+		if(fgets(buffer, 256, fp) != nullptr)
+			result += buffer;
+	}
+
+	// Parse the result into lines then parse each line
+	std::vector<std::string> lines = split_string_to_vector(result, '\n');
+	for(auto line : lines){
+		std::vector<std::string> words = split_string_to_vector(line, ' ');
+		if(words.size() != 3 || !(words.at(1) == "T" || words.at(1) == "t") || words.at(0) == "")
+			continue; // just ignore any symbols we can't parse
+			//throw AftermathException("Failed to parse binary symbol results via: " + command);
+		
+		// first word is address
+		// second word is the symbol type
+		// third word is the symbol name
+		size_t char_idx = 0;
+		uint64_t addr = std::stoull(words.at(0), &char_idx, 10);
+	
+		symbols_by_addr.insert(std::make_pair(addr, words.at(2)));
+		
+	}
+
+	pclose(fp);
+
+	return symbols_by_addr;
+
+}
+
 /* Reads the trace file whose filename including its path is given from disk and
  * sets it as the trace for this Aftermath session.
  *
  * Throws an exception on error.
  */
-void AftermathSession::loadTrace(const char* filename, unsigned id)
+void AftermathSession::loadTrace(
+	const char* filename,
+	unsigned id,
+	const char* binary_filename)
 {
 	struct am_trace* trace;
 	struct am_io_context ioctx;
@@ -651,13 +1039,26 @@ void AftermathSession::loadTrace(const char* filename, unsigned id)
 		throw;
 	}
 
+	std::map<uint64_t, std::string> symbol_table;
+	if(strcmp(binary_filename, "") != 0) {
+		try {
+
+			symbol_table = parseBinarySymbols(binary_filename);
+
+		} catch(...) {
+			// We couldn't get symbols from the provided binary
+			// TODO perhaps just continue?
+			throw;
+		}
+	}
+
 	am_io_context_destroy(&ioctx);
 	am_frame_type_registry_destroy(&frame_types);
 
   /* NO-body expects the Spanish Inquisition! */
   /* TODO: Temporary hack to create Aftermath types from
      raw OMPT data */
-  //processTrace(trace);
+  processTrace(trace, symbol_table);
 
 	this->setTrace(trace, id);
 }

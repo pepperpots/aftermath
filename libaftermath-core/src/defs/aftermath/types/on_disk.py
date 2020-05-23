@@ -439,19 +439,30 @@ am_dsk_stack_frame = EventFrame(
             field_type = am_dsk_interval,
             comment = "Execution interval while frame was on stack")]))
 
-# stack frames are enumerable per CPU
 tags.dsk.tomem.add_per_event_collection_tags(
     am_dsk_stack_frame,
     aftermath.types.in_memory.am_stack_frame,
     "collection_id")
 
-# associate stack frame to symbol
-relations.join.make_join(
-    dsk_src_field = am_dsk_stack_frame.getFields().getFieldByName("addr"),
-    dsk_target_field = am_dsk_function_symbol.getFields().getFieldByName("addr"),
-    mem_ptr_field = aftermath.types.in_memory.am_stack_frame.getFields().getFieldByName("function_symbol"),
-    mem_target_type = aftermath.types.in_memory.am_function_symbol,
-    null_allowed = False)
+################################################################################
+
+am_dsk_stack_frame_period = EventFrame(
+    name = "am_dsk_stack_frame_period",
+    entity = "on-disk stack frame period",
+    comment = "A period during which the frame was at the top of the stack",
+
+		# no additional information because this is constructed at trace-load
+		# TODO why do I need an on-disk type?
+		fields = FieldList([
+				Field(
+						name = "interval",
+						field_type = am_dsk_interval,
+						comment = "Interval of the stack frame period")]))
+
+tags.dsk.tomem.add_per_event_collection_tags(
+    am_dsk_stack_frame_period,
+    aftermath.types.in_memory.am_stack_frame_period,
+    "collection_id")
 
 ################################################################################
 
@@ -471,7 +482,8 @@ all_types = TypeList([
     am_dsk_event_mapping,
     am_dsk_hierarchy_description,
 		am_dsk_function_symbol,
-		am_dsk_stack_frame
+		am_dsk_stack_frame,
+		am_dsk_stack_frame_period
 ])
 
 aftermath.config.addDskTypes(*all_types)

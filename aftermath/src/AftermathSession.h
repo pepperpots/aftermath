@@ -100,8 +100,15 @@ class AftermathSession {
 		DFGQTProcessor& getDFGProcessor();
 		DFGQTProcessor* getDFGProcessorp();
 
-		void loadTrace(const char* filename, unsigned id);
+		void loadTrace(
+			const char* filename,
+			unsigned id,
+			const char* binary_filename);
+
 		void loadDFG(const char* filename);
+
+		std::map<uint64_t, std::string> parseBinarySymbols(
+			const char* binary_filename);
 
 	protected:
 		void cleanup();

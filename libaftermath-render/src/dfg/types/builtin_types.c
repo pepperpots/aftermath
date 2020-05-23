@@ -40,6 +40,8 @@ AM_RENDER_DFG_DECL_TIMELINE_LAYER_TYPE(axes, "axes")
 AM_RENDER_DFG_DECL_TIMELINE_LAYER_TYPE(background, "background")
 AM_RENDER_DFG_DECL_TIMELINE_LAYER_TYPE(hierarchy, "hierarchy")
 AM_RENDER_DFG_DECL_TIMELINE_LAYER_TYPE(measurement_intervals, "measurement_intervals")
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_TYPE(stack_frame_period, "core::stack_frame_period")
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_TYPE(function_symbol, "core::function_symbol")
 AM_RENDER_DFG_DECL_TIMELINE_LAYER_TYPE(openmp_for_loop_type, "openmp::for_loop_type")
 AM_RENDER_DFG_DECL_TIMELINE_LAYER_TYPE(openmp_for_loop_instance, "openmp::for_loop_instance")
 AM_RENDER_DFG_DECL_TIMELINE_LAYER_TYPE(openmp_iteration_set, "openmp::iteration_set")
@@ -77,6 +79,8 @@ static struct am_dfg_static_type_def* builtin_defs[] = {
 	&am_render_dfg_type_timeline_background_layer,
 	&am_render_dfg_type_timeline_hierarchy_layer,
 	&am_render_dfg_type_timeline_measurement_intervals_layer,
+	&am_render_dfg_type_timeline_stack_frame_period_layer,
+	&am_render_dfg_type_timeline_function_symbol_layer,
 	&am_render_dfg_type_timeline_openmp_for_loop_type_layer,
 	&am_render_dfg_type_timeline_openmp_for_loop_instance_layer,
 	&am_render_dfg_type_timeline_openmp_iteration_set_layer,

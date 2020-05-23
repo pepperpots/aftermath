@@ -19,6 +19,9 @@
 
 #include "openmp.h"
 #include <aftermath/core/in_memory.h>
+#include <aftermath/core/stack_frame_array.h>
+#include <aftermath/core/stack_frame_period_array.h>
+#include <aftermath/core/function_symbol_array.h>
 #include <aftermath/core/openmp_for_loop_type_array.h>
 #include <aftermath/core/openmp_for_loop_instance_array.h>
 #include <aftermath/core/openmp_iteration_set_array.h>
@@ -30,7 +33,9 @@
 #include <aftermath/render/timeline/layers/interval.h>
 #include <aftermath/render/timeline/layers/discrete.h>
 #include <aftermath/render/timeline/renderer.h>
+#include <aftermath/render/stateful_color_map.h>
 
+/*
 struct am_color_map openmp_colors = AM_STATIC_COLOR_MAP({
 		  AM_RGBA255_EL(0xfc, 0xcc, 0x9b, 255),
 			AM_RGBA255_EL(0x2a, 0x58, 0x41, 255),
@@ -41,6 +46,7 @@ struct am_color_map openmp_colors = AM_STATIC_COLOR_MAP({
 			AM_RGBA255_EL(255, 241, 118, 255),
 			AM_RGBA255_EL(255, 183,  77, 255)
 		});
+*/
 
 static int trace_changed_per_trace_array(struct am_timeline_render_layer* l,
 					 struct am_trace* t,
@@ -56,7 +62,10 @@ static int trace_changed_per_trace_array(struct am_timeline_render_layer* l,
 		am_timeline_interval_layer_set_extra_data(il, arr);
 		am_timeline_interval_layer_set_color_map(
 			AM_TIMELINE_INTERVAL_LAYER(l),
-			&openmp_colors);
+			//&openmp_colors);
+			&static_colors);
+	} else {
+		fprintf(stderr, "Unable to find the trace array for %s!\n", array_ident);
 	}
 
 	return am_timeline_interval_layer_set_max_index(
@@ -69,17 +78,17 @@ static int trace_changed_per_ecoll_array(struct am_timeline_render_layer* l,
 {
 	struct am_timeline_interval_layer* il = (typeof(il))l;
 
-	am_timeline_interval_layer_set_color_map(il, &openmp_colors);
+	am_timeline_interval_layer_set_color_map(il, &static_colors);
 
 	return am_timeline_interval_layer_set_max_index(
-		il, openmp_colors.num_elements-1);
+		il, static_colors.num_elements-1);
 }
 
 static int trace_changed_per_discrete_ecoll_array(struct am_timeline_render_layer* l,
 					 struct am_trace* t)
 {
 	return am_timeline_discrete_layer_set_max_index(
-		AM_TIMELINE_DISCRETE_LAYER(l), openmp_colors.num_elements-1);
+		AM_TIMELINE_DISCRETE_LAYER(l), static_colors.num_elements-1);
 }
 
 void render_event(
@@ -98,6 +107,112 @@ void render_event(
   cairo_rectangle(cr, px, 0, lane_height / 5, lane_height / 10);
   cairo_stroke_preserve(cr);
   cairo_fill(cr);
+}
+
+/* For stack frame period */
+
+static int trace_changed_stack_frame_period(struct am_timeline_render_layer* l,
+				   struct am_trace* t)
+{
+	return trace_changed_per_ecoll_array(l, t);
+}
+
+static int renderer_changed_stack_frame_period(struct am_timeline_render_layer* l,
+				      struct am_timeline_renderer* r)
+{
+	if(r->trace)
+		return trace_changed_stack_frame_period(l, r->trace);
+	else
+		return 0;
+}
+
+static size_t calculate_index_stack_frame_period(struct am_timeline_interval_layer* l, void* arg)
+{
+	struct am_stack_frame_period* sfp = arg;
+	struct am_stack_frame* sf = sfp->stack_frame;
+
+	// get a new color from the color map
+	uint64_t address_identifier = (uint64_t) sf;
+	
+	size_t ret = am_stateful_color_map_get_color_index(address_identifier);
+
+	return ret;
+}
+
+struct am_timeline_render_layer_type*
+am_timeline_stack_frame_period_layer_instantiate_type(void)
+{
+	struct am_timeline_render_layer_type* t;
+
+	t = am_timeline_interval_layer_instantiate_type_index_fun(
+		"core::stack_frame_period",
+		"am::core::stack_frame_period",
+		sizeof(struct am_stack_frame_period),
+		offsetof(struct am_stack_frame_period, interval),
+		calculate_index_stack_frame_period);
+
+	t->trace_changed = trace_changed_stack_frame_period;
+	t->renderer_changed = renderer_changed_stack_frame_period;
+
+	return t;
+}
+
+/* For function symbol */
+
+static int trace_changed_function_symbol(struct am_timeline_render_layer* l,
+				   struct am_trace* t)
+{
+	return trace_changed_per_trace_array(l, t, "am::core::function_symbol");
+}
+
+static int renderer_changed_function_symbol(struct am_timeline_render_layer* l,
+				      struct am_timeline_renderer* r)
+{
+	if(r->trace)
+		return trace_changed_function_symbol(l, r->trace);
+	else
+		return 0;
+}
+
+// Changed this from taking a random address and taking modulo of it to get color (i.e. conflict)
+// to instead get programmatically and consistently from a static color map
+static size_t calculate_index_function_symbol(struct am_timeline_interval_layer* l, void* arg)
+{
+	struct am_stack_frame_period* sfp = arg;
+	struct am_function_symbol_array* sarr;
+	struct am_function_symbol* s;
+
+	s = sfp->stack_frame->function_symbol;
+	/*
+	sarr = am_timeline_interval_layer_get_extra_data(l);
+
+	size_t idx = am_function_symbol_array_index(sarr, s);
+
+	size_t ret = (idx % (openmp_colors.num_elements - 1));
+	*/
+
+	uint64_t address_identifier = (uint64_t) s;
+	size_t ret = am_stateful_color_map_get_color_index(address_identifier);
+	
+	return ret;
+}
+
+struct am_timeline_render_layer_type*
+am_timeline_function_symbol_layer_instantiate_type(void)
+{
+	struct am_timeline_render_layer_type* t;
+
+	t = am_timeline_interval_layer_instantiate_type_index_fun(
+		"core::function_symbol",
+		"am::core::stack_frame_period",
+		sizeof(struct am_stack_frame_period),
+		offsetof(struct am_stack_frame_period, interval),
+		calculate_index_function_symbol);
+
+	t->trace_changed = trace_changed_function_symbol;
+	t->renderer_changed = renderer_changed_function_symbol;
+
+	return t;
 }
 
 /* For loop type */
@@ -434,7 +549,7 @@ static size_t calculate_index_task_period(
   /* TODO: Better expression needed with 8 colours there are too many
      conflicts, probably prime module would fix it to some extent. */
 
-	return ((size_t)(tp->task_instance)) % (openmp_colors.num_elements - 1);
+	return ((size_t)(tp->task_instance)) % (static_colors.num_elements - 1);
 }
 
 struct am_timeline_render_layer_type*

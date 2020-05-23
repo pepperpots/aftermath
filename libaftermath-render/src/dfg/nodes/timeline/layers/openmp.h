@@ -24,6 +24,32 @@
 #include <aftermath/render/dfg/timeline_layer_common.h>
 
 AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	stack_frame_period,
+	"core::stack_frame_period",
+	"Timeline OpenMP Stack Frame Period Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	stack_frame_period,
+	"core::stack_frame_period",
+	"Timeline OpenMP Stack Frame Layer Configuration")
+
+int am_render_dfg_timeline_stack_frame_period_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
+	function_symbol,
+	"core::function_symbol",
+	"Timeline OpenMP Function Symbol Layer Filter")
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
+	function_symbol,
+	"core::function_symbol",
+	"Timeline OpenMP Function Symbol Layer Configuration")
+
+int am_render_dfg_timeline_function_symbol_layer_configuration_node_process(
+	struct am_dfg_node* n);
+
+AM_RENDER_DFG_DECL_TIMELINE_LAYER_FILTER_NODE_TYPE(
 	openmp_for_loop_type,
 	"openmp::for_loop_type",
 	"Timeline OpenMP Loop Type Layer Filter")
@@ -413,6 +439,10 @@ AM_DFG_ADD_BUILTIN_NODE_TYPES(
 	&am_render_dfg_timeline_openmp_flush_layer_filter_node_type,
 	&am_render_dfg_timeline_openmp_flush_layer_configuration_node_type,
 	&am_render_dfg_timeline_openmp_cancel_layer_filter_node_type,
-	&am_render_dfg_timeline_openmp_cancel_layer_configuration_node_type)
+	&am_render_dfg_timeline_openmp_cancel_layer_configuration_node_type,
+	&am_render_dfg_timeline_stack_frame_period_layer_filter_node_type,
+	&am_render_dfg_timeline_stack_frame_period_layer_configuration_node_type,
+	&am_render_dfg_timeline_function_symbol_layer_filter_node_type,
+	&am_render_dfg_timeline_function_symbol_layer_configuration_node_type)
 
 #endif

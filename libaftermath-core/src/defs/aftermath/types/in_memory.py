@@ -238,10 +238,40 @@ am_stack_frame = InMemoryCompoundType(
             comment = "What function from the symbol table did this stack " + \
 						"frame execute"),
         Field(
+            name = "addr", # TODO this shouldn't be like this
+            field_type = aftermath.types.builtin.uint64_t,
+            comment = "TEMPORARY: Address of the symbol, stored here because I don't know how to generate twp seperate in-memory types from one on-disk type"),
+        Field(
             name = "interval",
             field_type = am_interval,
-            comment = "Interval during which the state was active")
+            comment = "Interval during which the state was active"),
+				Field(
+						name = "depth",
+						field_type = aftermath.types.builtin.size_t,
+						comment = "Depth of the frame in the call-stack")
 				]))
+
+am_stack_frame_period = InMemoryCompoundType(
+    name = "am_stack_frame_period",
+    entity = "stack frame period",
+    comment = "A period during which the frame was at the top of the stack",
+    ident = "am::core::stack_frame_period",
+
+        fields = FieldList([
+            Field(
+                name = "stack_frame",
+                field_type = am_stack_frame,
+                is_pointer = True,
+                comment = "Stack frame that this period belongs to"),
+            Field(
+                name = "interval",
+                field_type = am_interval,
+                comment = "Interval of the stack frame period")]))
+
+am_stack_frame_period.addTag(
+    aftermath.tags.GenerateDefaultConstructor(field_values = [
+        ("stack_frame", "NULL")
+    ]))
 
 am_stack_frame.getFields().prependFields([
 		Field(
@@ -259,17 +289,33 @@ am_stack_frame.getFields().prependFields([
 				name = "child_frames",
 				field_type = am_stack_frame,
 				is_pointer = True,
-				# Not owned, as we want to access these stack frames independently
 				is_owned = False, 
-				is_array = True,
+				pointer_depth = 2,
 				array_num_elements_field_name = "num_child_frames",
-				comment = "Frames pushed immediately above this on the stack")])
+				comment = "Frames pushed immediately above this on the stack"),
+		Field(
+				name = "num_periods",
+				field_type = aftermath.types.builtin.size_t,
+				comment = "Number of entries in the periods (how " + \
+				"many periods was this frame executing on top of stack)"),
+		Field(
+				name = "periods",
+				field_type = am_stack_frame_period,
+				is_pointer = True,
+				is_owned = False, 
+				pointer_depth = 2,
+				array_num_elements_field_name = "num_periods",
+				comment = "Periods when this frame was executing on top of stack")])
 
 am_stack_frame.addTag(
     aftermath.tags.GenerateDefaultConstructor(field_values = [
+        ("function_symbol", "NULL"),
+				("depth", "0"),
         ("parent_frame", "NULL"),
         ("num_child_frames", "0"),
-        ("child_frames", "NULL")
+        ("child_frames", "NULL"),
+        ("num_periods", "0"),
+        ("periods", "NULL")
     ]))
 
 ################################################################################
@@ -282,7 +328,8 @@ toplevel_types = TypeList([
     am_state_event,
     am_source_location,
 		am_function_symbol,
-		am_stack_frame
+		am_stack_frame,
+		am_stack_frame_period
 ])
 
 aux_types = TypeList([

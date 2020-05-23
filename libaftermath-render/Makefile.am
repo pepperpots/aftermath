@@ -7,6 +7,8 @@ AM_CPPFLAGS = -I$(srcdir)/headers -I$(builddir)/headers
 libaftermath_render_la_SOURCES = src/cairo_extras.c \
 	src/cairo_extras.h \
 	src/color_map.h \
+	src/stateful_color_map.h \
+	src/stateful_color_map.c \
 	src/dfg/dfg_coordinate_mapping.h \
 	src/dfg/dfg_coordinate_mapping.c \
 	src/dfg/nodes/builtin_nodes.c \

@@ -34,6 +34,10 @@ int am_dfg_trace_node_process(struct am_dfg_node* n)
 	struct am_dfg_port* ptrace = &n->ports[0];
   struct am_dfg_port* ptrace1 = &n->ports[1];
 
-	return am_dfg_buffer_write(ptrace->buffer, 1, &t->trace) +
-  am_dfg_buffer_write(ptrace1->buffer, 1, &t->aux_trace);
+	if(t->aux_trace == NULL)
+		return am_dfg_buffer_write(ptrace->buffer, 1, &t->trace);
+			//am_dfg_buffer_write(ptrace1->buffer, 1, &t->trace);
+	else
+		return am_dfg_buffer_write(ptrace->buffer, 1, &t->trace) +
+			am_dfg_buffer_write(ptrace1->buffer, 1, &t->aux_trace);
 }
