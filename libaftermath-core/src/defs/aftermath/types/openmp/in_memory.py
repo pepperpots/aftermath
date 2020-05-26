@@ -639,13 +639,25 @@ am_openmp_task_create = InMemoryCompoundType(
                 field_type = aftermath.types.base.am_timestamp_t,
                 comment = "Time of the event"),
             Field(
+                name = "task_id",
+                field_type = aftermath.types.builtin.uint64_t,
+                comment = "Unique task id"),
+            Field(
+                name = "new_task_id",
+                field_type = aftermath.types.builtin.uint64_t,
+                comment = "Unique new task id"),
+            Field(
                 name = "flags",
                 field_type = am_openmp_task_flag_t,
                 comment = "Kind of task"),
             Field(
                 name = "has_dependence",
                 field_type = aftermath.types.base.am_bool_t,
-                comment = "True if task has dependences")]))
+                comment = "True if task has dependences"),
+            Field(
+                name = "codeptr_ra",
+                field_type = aftermath.types.builtin.uint64_t,
+                comment = "OpenMP region code pointer")]))
 
 ################################################################################
 
@@ -659,6 +671,14 @@ am_openmp_task_schedule = InMemoryCompoundType(
                 name = "timestamp",
                 field_type = aftermath.types.base.am_timestamp_t,
                 comment = "Time of the event"),
+            Field(
+                name = "prior_task_id",
+                field_type = aftermath.types.builtin.uint64_t,
+                comment = "Unique id of the encountering task"),
+            Field(
+                name = "next_task_id",
+                field_type = aftermath.types.builtin.uint64_t,
+                comment = "Unique id of the next task"),
             Field(
                 name = "prior_task_status",
                 field_type = am_openmp_task_status_t,
@@ -776,7 +796,15 @@ am_openmp_task_dependence = InMemoryCompoundType(
             Field(
                 name = "timestamp",
                 field_type = aftermath.types.base.am_timestamp_t,
-                comment = "Timestamp of the event")]))
+                comment = "Timestamp of the event"),
+            Field(
+                name = "src_task_id",
+                field_type = aftermath.types.builtin.uint64_t,
+                comment = "Unique id of the source task"),
+            Field(
+                name = "sink_task_id",
+                field_type = aftermath.types.builtin.uint64_t,
+                comment = "Unique id of the sink task")]))
 
 ################################################################################
 

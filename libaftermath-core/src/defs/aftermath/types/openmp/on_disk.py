@@ -295,13 +295,25 @@ am_dsk_openmp_task_create = EventFrame(
             field_type = aftermath.types.builtin.uint64_t,
             comment = "Time of the event"),
         Field(
+            name = "task_id",
+            field_type = aftermath.types.builtin.uint64_t,
+            comment = "Unique task id"),
+        Field(
+            name = "new_task_id",
+            field_type = aftermath.types.builtin.uint64_t,
+            comment = "Unique new task id"),
+        Field(
             name = "flags",
             field_type = aftermath.types.builtin.uint16_t,
             comment = "Kind of the task"),
         Field(
             name = "has_dependences",
             field_type = aftermath.types.builtin.uint8_t,
-            comment = "True if the task has dependences")]))
+            comment = "True if the task has dependences"),
+        Field(
+            name = "codeptr_ra",
+            field_type = aftermath.types.builtin.uint64_t,
+            comment = "OpenMP region code pointer")]))
 
 tags.dsk.tomem.add_per_event_collection_tags(
     am_dsk_openmp_task_create,
@@ -319,6 +331,14 @@ am_dsk_openmp_task_schedule = EventFrame(
             name = "timestamp",
             field_type = aftermath.types.builtin.uint64_t,
             comment = "Time of the event"),
+        Field(
+            name = "prior_task_id",
+            field_type = aftermath.types.builtin.uint64_t,
+            comment = "Unique id of the encountering task"),
+        Field(
+            name = "next_task_id",
+            field_type = aftermath.types.builtin.uint64_t,
+            comment = "Unique id of the next task"),
         Field(
             name = "prior_task_status",
             field_type = aftermath.types.builtin.uint8_t,
@@ -438,7 +458,15 @@ am_dsk_openmp_task_dependence = EventFrame(
         Field(
             name = "timestamp",
             field_type = aftermath.types.builtin.uint64_t,
-            comment = "Time of the event")]))
+            comment = "Time of the event"),
+        Field(
+            name = "src_task_id",
+            field_type = aftermath.types.builtin.uint64_t,
+            comment = "Unique id of the source task"),
+        Field(
+            name = "sink_task_id",
+            field_type = aftermath.types.builtin.uint64_t,
+            comment = "Unique id of the sink task")]))
 
 tags.dsk.tomem.add_per_event_collection_tags(
     am_dsk_openmp_task_dependence,
