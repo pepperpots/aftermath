@@ -113,6 +113,8 @@ libaftermath_core_la_SOURCES = src/ansi_extras.c \
 				src/dfg/nodes/select_nth.h \
 				src/dfg/nodes/state_description_attributes.c \
 				src/dfg/nodes/state_description_attributes.h \
+				src/dfg/nodes/stack_frame_period_attributes.c \
+				src/dfg/nodes/stack_frame_period_attributes.h \
 				src/dfg/nodes/state_event_attributes.c \
 				src/dfg/nodes/state_event_attributes.h \
 				src/dfg/nodes/string_concat.c \

@@ -432,3 +432,71 @@ int am_timeline_interval_layer_get_dominant_index(
 
 	return 0;
 }
+
+// Returns the first element found at am_interval
+// Return 1 if none found
+// TODO handle collapsed nodes (recurse into children? return array of elements?)
+int am_timeline_interval_layer_get_dominant_element(
+	struct am_timeline_interval_layer* il,
+	struct am_hierarchy_node* hn,
+	const struct am_interval* query,
+	uint64_t* address_of_element)
+{
+	struct am_timeline_interval_layer_type* ilt;
+	ilt = (struct am_timeline_interval_layer_type*)il->super.super.type;
+	
+	struct am_timeline_lane_render_layer* rl = &il->super;
+	struct am_typed_array_generic* ea;
+	struct am_event_mapping* m = &hn->event_mapping;
+	struct am_event_collection* ec;
+	struct am_hierarchy_node* child;
+	struct am_timeline_render_layer* l = AM_TIMELINE_RENDER_LAYER(il);
+
+	uint64_t element_address_1 = 0;
+	size_t element_index_temp_1 = 0;
+
+	int found = 0;
+
+	// get the corresponding event array
+	am_event_mapping_for_each_collection_overlapping(m, query, ec) {
+		ea = am_event_collection_find_event_array(ec, ilt->event_array_type_name);
+		
+		if(!ea)
+			continue;
+				
+		size_t element_size = ilt->element_size;
+		off_t interval_field_offset = ilt->interval_offset;
+	
+		struct am_time_offset offs;
+		struct am_interval* i;
+
+		uint64_t element_address_2 = 0;
+
+		// find the element
+		am_interval_array_for_each_overlapping_offs(
+			ea, i, element_size, interval_field_offset, query)
+		{
+			am_interval_intersection_duration(i, query, &offs);
+			void* element_ptr = AM_PTR_SUB(i, interval_field_offset);
+
+			// Check if this period is not visible
+			if(ilt->calculate_index){
+				if(ilt->calculate_index(il, element_ptr) == 0)
+					continue;
+			}
+
+			found = 1;
+			element_address_2 = (uint64_t) element_ptr;
+		}
+
+		element_address_1 = element_address_2;
+
+	}
+
+	*address_of_element = element_address_1;
+
+	if(found)
+		return 0;
+	else
+		return 1;
+}

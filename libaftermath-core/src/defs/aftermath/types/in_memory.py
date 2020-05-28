@@ -256,6 +256,7 @@ am_stack_frame_period = InMemoryCompoundType(
     entity = "stack frame period",
     comment = "A period during which the frame was at the top of the stack",
     ident = "am::core::stack_frame_period",
+    tags = [ tags.mem.dfg.DeclareConstPointerType() ],
 
         fields = FieldList([
             Field(
@@ -263,6 +264,10 @@ am_stack_frame_period = InMemoryCompoundType(
                 field_type = am_stack_frame,
                 is_pointer = True,
                 comment = "Stack frame that this period belongs to"),
+						Field(
+                name = "rank",
+								field_type = aftermath.types.builtin.size_t,
+                comment = "Sequential rank of period within the stack frame execution"),
             Field(
                 name = "interval",
                 field_type = am_interval,
@@ -270,7 +275,8 @@ am_stack_frame_period = InMemoryCompoundType(
 
 am_stack_frame_period.addTag(
     aftermath.tags.GenerateDefaultConstructor(field_values = [
-        ("stack_frame", "NULL")
+        ("stack_frame", "NULL"),
+        ("rank", "0"),
     ]))
 
 am_stack_frame.getFields().prependFields([

@@ -16,11 +16,13 @@
  * USA.
  */
 
-#include <aftermath/render/stateful_color_map.h>
+#include <aftermath/render/stateful_color_map_indexer.h>
 
-struct am_stateful_color_map stateful_cm;
+struct am_stateful_color_map_indexer stateful_cmi;
+pthread_mutex_t lock;
 
 struct am_color_map static_colors = AM_STATIC_COLOR_MAP({
+		AM_RGBA255_EL(255, 255, 255, 0),
 		AM_RGBA255_EL(255, 0, 255, 255),
 		AM_RGBA255_EL(28, 255, 230, 255),
 		AM_RGBA255_EL(255, 255, 52, 255),

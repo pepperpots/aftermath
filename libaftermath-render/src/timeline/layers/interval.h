@@ -88,4 +88,13 @@ int am_timeline_interval_layer_get_dominant_index(
 	size_t* index,
 	int* index_valid);
 
+/* Return an index (and pointer) to the actual element displayed at the interval
+ * If multiple elements, will get the one with the maximum index
+ */
+int am_timeline_interval_layer_get_dominant_element(
+	struct am_timeline_interval_layer* il,
+	struct am_hierarchy_node* hn,
+	const struct am_interval* query,
+	uint64_t* address_of_element);
+
 #endif

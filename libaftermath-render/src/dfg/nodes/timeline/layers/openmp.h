@@ -387,6 +387,33 @@ AM_RENDER_DFG_DECL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
 int am_render_dfg_timeline_openmp_cancel_layer_configuration_node_process(
 	struct am_dfg_node* n);
 
+int am_render_dfg_timeline_openmp_stack_frame_period_layer_dominant_period_at_pos_node_type_process(
+	struct am_dfg_node* n);
+
+/* Node that extracts the dominant Stack Frame Period at the pixel intervals */
+AM_DFG_DECL_BUILTIN_NODE_TYPE(
+	am_render_dfg_timeline_openmp_stack_frame_period_layer_dominant_period_at_pos_node_type,
+	"am::render::timeline::layer::openmp::stack_frame_period::dominant_period_at_pos",
+	"Dominant Stack Frame Frame Period at Position",
+	AM_DFG_NODE_DEFAULT_SIZE,
+	AM_DFG_DEFAULT_PORT_DEPS_PURE_FUNCTIONAL,
+	AM_DFG_NODE_FUNCTIONS({
+		.process = am_render_dfg_timeline_openmp_stack_frame_period_layer_dominant_period_at_pos_node_type_process
+	}),
+	AM_DFG_NODE_PORTS(
+		{ "layer",
+		  "const am::render::timeline::layer::core::stack_frame_period*",
+		  AM_DFG_PORT_IN },
+		{ "mouse position",
+		  "am::core::pair<am::core::timestamp,const am::core::hierarchy_node*>",
+		  AM_DFG_PORT_IN },
+		{ "dominant stack_frame_period",
+		  "const am::core::stack_frame_period*",
+		  AM_DFG_PORT_OUT }
+	),
+	AM_DFG_PORT_DEPS(),
+	AM_DFG_NODE_PROPERTIES())
+
 AM_DFG_ADD_BUILTIN_NODE_TYPES(
 	&am_render_dfg_timeline_openmp_for_loop_type_layer_filter_node_type,
 	&am_render_dfg_timeline_openmp_for_loop_type_layer_configuration_node_type,
@@ -443,6 +470,7 @@ AM_DFG_ADD_BUILTIN_NODE_TYPES(
 	&am_render_dfg_timeline_stack_frame_period_layer_filter_node_type,
 	&am_render_dfg_timeline_stack_frame_period_layer_configuration_node_type,
 	&am_render_dfg_timeline_function_symbol_layer_filter_node_type,
-	&am_render_dfg_timeline_function_symbol_layer_configuration_node_type)
+	&am_render_dfg_timeline_function_symbol_layer_configuration_node_type,
+	&am_render_dfg_timeline_openmp_stack_frame_period_layer_dominant_period_at_pos_node_type)
 
 #endif

@@ -168,9 +168,7 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 						strncpy(new_sym->name, sym_name_str.c_str(), sym_name_str.length());
 						new_sym->name[sym_name_str.length()] = '\0';
 
-						std::cout << "Setting address " << frame->addr << " to " << sym_name_str << std::endl;
-						
-						//new_sym->name = &sym_name_str[0];; // convert the string to non-const char*
+						//std::cout << "Setting address " << frame->addr << " to " << sym_name_str << std::endl;
 
             function_symbol_map.emplace(frame->addr, new_sym);
             am_function_symbol_array_appendp(function_symbols, new_sym);
@@ -203,9 +201,11 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 
 								auto period_iter = periods_per_frame.find(top_frame);
 								if(period_iter == periods_per_frame.end()){
+									ending_period->rank = 0;
 									std::vector<am_stack_frame_period*> periods = {ending_period};
 									periods_per_frame.insert(std::make_pair(top_frame, periods));
 								} else {
+									ending_period->rank = period_iter->second.size();
 									period_iter->second.push_back(ending_period);
 								}
 
@@ -229,9 +229,11 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 								
 								auto period_iter = periods_per_frame.find(top_frame);
 								if(period_iter == periods_per_frame.end()){
+									period_before_start->rank = 0;
 									std::vector<am_stack_frame_period*> periods = {period_before_start};
 									periods_per_frame.insert(std::make_pair(top_frame, periods));
 								} else {
+									period_before_start->rank = period_iter->second.size();
 									period_iter->second.push_back(period_before_start);
 								}
 								
@@ -292,9 +294,11 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 
 						auto period_iter = periods_per_frame.find(top_frame);
 						if(period_iter == periods_per_frame.end()){
+							ending_period->rank = 0;
 							std::vector<am_stack_frame_period*> periods = {ending_period};
 							periods_per_frame.insert(std::make_pair(top_frame, periods));
 						} else {
+							ending_period->rank = period_iter->second.size();
 							period_iter->second.push_back(ending_period);
 						}
 						

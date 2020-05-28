@@ -48,32 +48,9 @@ am_dfg_graph {
 				id: 14u64,
 				format: "State: %s"
 			},
-		am::core::merge2 {
-				id: 15u64
-			},
 		am::core::string_concat {
 				id: 16u64,
 				separator: ", "
-			},
-		am::gui::toolbar_togglebutton {
-				id: 100u64,
-				widget_id: "toolbutton_draw_stack_frame_periods"
-			},
-		am::render::timeline::layer::core::stack_frame_period::filter {
-				id: 95u64
-			},
-		am::render::timeline::layer::core::stack_frame_period::configuration {
-				id: 96u64
-			},
-		am::gui::toolbar_togglebutton {
-				id: 97u64,
-				widget_id: "toolbutton_draw_function_symbols"
-			},
-		am::render::timeline::layer::core::function_symbol::filter {
-				id: 98u64
-			},
-		am::render::timeline::layer::core::function_symbol::configuration {
-				id: 99u64
 			},
 		am::gui::toolbar_togglebutton {
 				id: 17u64,
@@ -299,7 +276,7 @@ am_dfg_graph {
 				id: 83u64
 			},
 		am::render::timeline::layer::openmp::task_schedule::configuration {
-				id:84u64
+				id: 84u64
 			},
 		am::gui::toolbar_togglebutton {
 				id: 85u64,
@@ -334,6 +311,39 @@ am_dfg_graph {
 		am::gui::toolbar_togglebutton {
 				id: 94u64,
 				widget_id: "toolbutton_draw_openmp_cancel"
+			},
+		am::render::timeline::layer::core::stack_frame_period::filter {
+				id: 95u64
+			},
+		am::render::timeline::layer::core::stack_frame_period::configuration {
+				id: 96u64
+			},
+		am::gui::toolbar_togglebutton {
+				id: 97u64,
+				widget_id: "toolbutton_draw_function_symbols"
+			},
+		am::render::timeline::layer::core::function_symbol::filter {
+				id: 98u64
+			},
+		am::render::timeline::layer::core::function_symbol::configuration {
+				id: 99u64
+			},
+		am::gui::toolbar_togglebutton {
+				id: 100u64,
+				widget_id: "toolbutton_draw_stack_frame_periods"
+			},
+		am::render::timeline::layer::openmp::stack_frame_period::dominant_period_at_pos {
+				id: 101u64
+			},
+		am::core::stack_frame_period::attributes {
+				id: 102u64
+			},
+		am::core::string_format {
+				id: 103u64,
+				format: "%s"
+			},
+		am::core::merge3 {
+				id: 104u64
 			}
 		],
 	connections: [
@@ -351,17 +361,9 @@ am_dfg_graph {
 		[2u64, "mouse position", 12u64, "mouse position"],
 		[12u64, "dominant state", 13u64, "in"],
 		[13u64, "name", 14u64, "in"],
-		[7u64, "out", 15u64, "in0"],
-		[14u64, "out", 15u64, "in1"],
-		[15u64, "out", 16u64, "in"],
+		[104u64, "out", 16u64, "in"],
 		[2u64, "layers", 18u64, "in"],
 		[18u64, "out", 19u64, "layer"],
-		[100u64, "toggled", 96u64, "enable"],
-		[2u64, "layers", 95u64, "in"],
-		[95u64, "out", 96u64, "layer"],
-		[97u64, "toggled", 99u64, "enable"],
-		[2u64, "layers", 98u64, "in"],
-		[98u64, "out", 99u64, "layer"],
 		[17u64, "toggled", 19u64, "enable"],
 		[2u64, "layers", 21u64, "in"],
 		[21u64, "out", 22u64, "layer"],
@@ -383,78 +385,91 @@ am_dfg_graph {
 		[35u64, "toggled", 37u64, "enable"],
 		[2u64, "layers", 38u64, "in"],
 		[38u64, "out", 39u64, "layer"],
-    [40u64, "toggled", 39u64, "enable"],
+		[40u64, "toggled", 39u64, "enable"],
 		[2u64, "layers", 41u64, "in"],
 		[41u64, "out", 42u64, "layer"],
-    [43u64, "toggled", 42u64, "enable"],
+		[43u64, "toggled", 42u64, "enable"],
 		[2u64, "layers", 44u64, "in"],
 		[44u64, "out", 45u64, "layer"],
-    [46u64, "toggled", 45u64, "enable"],
+		[46u64, "toggled", 45u64, "enable"],
 		[2u64, "layers", 47u64, "in"],
 		[47u64, "out", 48u64, "layer"],
-    [49u64, "toggled", 48u64, "enable"],
+		[49u64, "toggled", 48u64, "enable"],
 		[2u64, "layers", 50u64, "in"],
 		[50u64, "out", 51u64, "layer"],
-    [52u64, "toggled", 51u64, "enable"],
+		[52u64, "toggled", 51u64, "enable"],
 		[2u64, "layers", 53u64, "in"],
 		[53u64, "out", 54u64, "layer"],
-    [55u64, "toggled", 54u64, "enable"],
+		[55u64, "toggled", 54u64, "enable"],
 		[2u64, "layers", 56u64, "in"],
 		[56u64, "out", 57u64, "layer"],
-    [58u64, "toggled", 57u64, "enable"],
+		[58u64, "toggled", 57u64, "enable"],
 		[2u64, "layers", 59u64, "in"],
 		[59u64, "out", 60u64, "layer"],
-    [61u64, "toggled", 60u64, "enable"],
+		[61u64, "toggled", 60u64, "enable"],
 		[2u64, "layers", 62u64, "in"],
 		[62u64, "out", 63u64, "layer"],
-    [64u64, "toggled", 63u64, "enable"],
+		[64u64, "toggled", 63u64, "enable"],
 		[2u64, "layers", 65u64, "in"],
 		[65u64, "out", 66u64, "layer"],
-    [67u64, "toggled", 66u64, "enable"],
+		[67u64, "toggled", 66u64, "enable"],
 		[2u64, "layers", 68u64, "in"],
 		[68u64, "out", 69u64, "layer"],
-    [70u64, "toggled", 69u64, "enable"],
+		[70u64, "toggled", 69u64, "enable"],
 		[2u64, "layers", 71u64, "in"],
 		[71u64, "out", 72u64, "layer"],
-    [73u64, "toggled", 72u64, "enable"],
+		[73u64, "toggled", 72u64, "enable"],
 		[2u64, "layers", 74u64, "in"],
 		[74u64, "out", 75u64, "layer"],
-    [76u64, "toggled", 75u64, "enable"],
+		[76u64, "toggled", 75u64, "enable"],
 		[2u64, "layers", 77u64, "in"],
 		[77u64, "out", 78u64, "layer"],
-    [79u64, "toggled", 78u64, "enable"],
+		[79u64, "toggled", 78u64, "enable"],
 		[2u64, "layers", 80u64, "in"],
 		[80u64, "out", 81u64, "layer"],
-    [82u64, "toggled", 81u64, "enable"],
+		[82u64, "toggled", 81u64, "enable"],
 		[2u64, "layers", 83u64, "in"],
 		[83u64, "out", 84u64, "layer"],
-    [85u64, "toggled", 84u64, "enable"],
+		[85u64, "toggled", 84u64, "enable"],
 		[2u64, "layers", 86u64, "in"],
 		[86u64, "out", 87u64, "layer"],
-    [88u64, "toggled", 87u64, "enable"],
+		[88u64, "toggled", 87u64, "enable"],
 		[2u64, "layers", 89u64, "in"],
 		[89u64, "out", 90u64, "layer"],
-    [91u64, "toggled", 90u64, "enable"],
+		[91u64, "toggled", 90u64, "enable"],
 		[2u64, "layers", 92u64, "in"],
 		[92u64, "out", 93u64, "layer"],
-    [94u64, "toggled", 93u64, "enable"]
+		[94u64, "toggled", 93u64, "enable"],
+		[2u64, "layers", 95u64, "in"],
+		[95u64, "out", 96u64, "layer"],
+		[100u64, "toggled", 96u64, "enable"],
+		[2u64, "layers", 98u64, "in"],
+		[98u64, "out", 99u64, "layer"],
+		[97u64, "toggled", 99u64, "enable"],
+		[95u64, "out", 101u64, "layer"],
+		[2u64, "mouse position", 101u64, "mouse position"],
+		[101u64, "dominant stack_frame_period", 102u64, "in"],
+		[102u64, "name", 103u64, "in"],
+		[7u64, "out", 104u64, "in0"],
+		[14u64, "out", 104u64, "in1"],
+		[103u64, "out", 104u64, "in2"]
 		],
 	positions: [
 		[1u64, 66.259260, 117.074074],
 		[2u64, 298.814815, 116.925926],
 		[3u64, 146.629630, 152.777778],
-		[4u64, 1419.382716, 245.111111],
-		[5u64, 486.092593, 245.092593],
-		[6u64, 745.592593, 245.314815],
-		[7u64, 891.345679, 245.265432],
+		[4u64, 1489.882716, 330.611111],
+		[5u64, 430.092593, 622.592593],
+		[6u64, 719.092593, 623.314815],
+		[7u64, 891.345679, 632.265432],
 		[8u64, 791.629630, 25.000000],
 		[9u64, 463.925926, 25.703704],
 		[10u64, 642.370370, 86.444444],
 		[12u64, 639.987654, 145.814815],
 		[13u64, 835.444444, 145.814815],
 		[14u64, 1027.222222, 145.888889],
-		[15u64, 1167.518519, 245.185185],
-		[16u64, 1282.037037, 245.086420],
+		[15u64, 1275.518519, 252.685185],
+		[16u64, 1328.537037, 330.586420],
 		[17u64, 640.728395, -22.839506],
 		[18u64, 460.135802, -74.493827],
 		[19u64, 793.296296, -75.382716],
@@ -533,11 +548,15 @@ am_dfg_graph {
 		[92u64, 444.000000, -2754.000000],
 		[93u64, 823.000000, -2754.000000],
 		[94u64, 673.000000, -2700.000000],
-		[100u64, 673.000000, -2800.000000],
-		[95u64, 444.000000, -2954.000000],
-		[96u64, 823.000000, -2954.000000],
+		[95u64, 343.187500, 442.562500],
+		[96u64, 729.375000, 441.125000],
 		[97u64, 673.000000, -2900.000000],
 		[98u64, 444.000000, -3054.000000],
-		[99u64, 823.000000, -3054.000000]
+		[99u64, 823.000000, -3054.000000],
+		[100u64, 585.500000, 523.406250],
+		[101u64, 608.343750, 338.177083],
+		[102u64, 780.843750, 248.677083],
+		[103u64, 1023.843750, 246.177083],
+		[104u64, 1177.843750, 322.177083]
 		]
 }

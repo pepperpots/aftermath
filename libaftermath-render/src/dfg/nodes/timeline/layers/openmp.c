@@ -17,13 +17,14 @@
  * USA.
  */
 
+#include <aftermath/core/stack_frame_period_array.h>
+#include <aftermath/core/dfg/types/pair_timestamp_hierarchy_node.h>
 #include <aftermath/render/dfg/nodes/timeline/layers/openmp.h>
 #include <aftermath/render/timeline/layer.h>
 #include <aftermath/render/timeline/layers/interval.h>
 #include <aftermath/render/timeline/renderer.h>
 
-AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
-	stack_frame_period,
+AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(stack_frame_period,
 	"core::stack_frame_period",
 	struct am_timeline_stack_frame_period_layer)
 
@@ -39,6 +40,108 @@ AM_RENDER_DFG_IMPL_TIMELINE_LAYER_FILTER_NODE_TYPE(
 AM_RENDER_DFG_IMPL_TIMELINE_LAYER_ENABLE_CONFIGURATION_NODE_TYPE(
 	function_symbol,
 	"core::function_symbol")
+
+
+int am_render_dfg_timeline_openmp_stack_frame_period_layer_dominant_period_at_pos_node_type_process(
+	struct am_dfg_node* n)
+{
+	struct am_dfg_port* player = &n->ports[0];
+	struct am_dfg_port* ppos = &n->ports[1];
+	struct am_dfg_port* pdom_nodes = &n->ports[2];
+
+	struct am_dfg_type_pair_timestamp_const_hierarchy_node* mouse_pos;
+	struct am_timeline_render_layer** layers;
+	struct am_timeline_render_layer* layer;
+	struct am_timeline_renderer* renderer;
+	struct am_stack_frame_period_array* sfp_array;
+	struct am_interval px_interval;
+	struct am_stack_frame_period* dom_sfp = NULL;
+	uint64_t element_address = 0;
+	int dom_index_valid;
+	size_t num_layers;
+	size_t num_pos;
+	size_t old_num_out;
+	double px;
+
+	if(!am_dfg_port_activated(player) || player->buffer->num_samples == 0 ||
+	   !am_dfg_port_activated(ppos) || ppos->buffer->num_samples == 0 ||
+	   !am_dfg_port_activated(pdom_nodes))
+	{
+		return 0;
+	}
+
+	num_layers = player->buffer->num_samples;
+	layers = player->buffer->data;
+
+	num_pos = ppos->buffer->num_samples;
+	mouse_pos = ppos->buffer->data;
+
+	old_num_out = pdom_nodes->buffer->num_samples;
+
+	for(size_t i = 0; i < num_layers; i++) {
+		layer = layers[i];
+
+		for(size_t j = 0; j < num_pos; j++) {
+			if(!layer->renderer)
+				goto out_err_resize;
+
+			renderer = layer->renderer;
+
+			/* If there is no trace, there cannot be any dominant period */
+			if(!layer->renderer->trace)
+				continue;
+
+			/* Ignore if the stack frame periods are not being rendered */
+			if(!layer->enabled)
+				continue;
+
+			/* Ignore invisible positions */
+			if(!am_interval_contains_p(&renderer->visible_interval,
+						   mouse_pos[j].timestamp))
+				continue;
+
+			/* Pixel at the input timestamp */
+			px = am_timeline_renderer_timestamp_to_x(
+				renderer, mouse_pos[j].timestamp);
+
+			/* Calculate interval that corresponds to the pixel */
+			if(am_timeline_renderer_x_to_timestamp(
+				   renderer, px, &px_interval.start) ||
+			   am_timeline_renderer_x_to_timestamp(
+				   renderer, px+1, &px_interval.end))
+			{
+				goto out_err_resize;
+			}
+
+			/* px interval is to be interpreted half-open (end
+			 * excluded); Calculate equivalent closed interval. */
+			if(px_interval.start != px_interval.end)
+				px_interval.end--;
+
+			/* Determine dominant element */
+			am_timeline_interval_layer_get_dominant_element(
+				   (struct am_timeline_interval_layer*)layer,
+				   mouse_pos[j].node,
+				   &px_interval,
+				   &element_address);
+
+			/* May be NULL if not found, letting next DFG node handle */
+			dom_sfp = (struct am_stack_frame_period*) element_address;
+
+			if(am_dfg_buffer_write(
+					 pdom_nodes->buffer, 1, &dom_sfp))
+				goto out_err_resize;
+
+		}
+	}
+
+	return 0;
+
+out_err_resize:
+	am_dfg_buffer_resize(pdom_nodes->buffer, old_num_out);
+	return 1;
+}
+
 
 /********************/
 

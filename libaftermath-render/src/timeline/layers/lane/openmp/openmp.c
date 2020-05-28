@@ -33,7 +33,7 @@
 #include <aftermath/render/timeline/layers/interval.h>
 #include <aftermath/render/timeline/layers/discrete.h>
 #include <aftermath/render/timeline/renderer.h>
-#include <aftermath/render/stateful_color_map.h>
+#include <aftermath/render/stateful_color_map_indexer.h>
 
 /*
 struct am_color_map openmp_colors = AM_STATIC_COLOR_MAP({
@@ -54,15 +54,11 @@ static int trace_changed_per_trace_array(struct am_timeline_render_layer* l,
 {
 	struct am_typed_array_generic* arr;
 	struct am_timeline_interval_layer* il = (typeof(il))l;
-	size_t max_index = 0;
 
 	if(t && (arr = am_trace_find_trace_array(t, array_ident))) {
-		max_index = arr->num_elements-1;
-
 		am_timeline_interval_layer_set_extra_data(il, arr);
 		am_timeline_interval_layer_set_color_map(
 			AM_TIMELINE_INTERVAL_LAYER(l),
-			//&openmp_colors);
 			&static_colors);
 	} else {
 		fprintf(stderr, "Unable to find the trace array for %s!\n", array_ident);
@@ -70,18 +66,19 @@ static int trace_changed_per_trace_array(struct am_timeline_render_layer* l,
 
 	return am_timeline_interval_layer_set_max_index(
 		AM_TIMELINE_INTERVAL_LAYER(l),
-		max_index);
+		static_colors.num_elements-1);
 }
 
 static int trace_changed_per_ecoll_array(struct am_timeline_render_layer* l,
 					 struct am_trace* t)
 {
-	struct am_timeline_interval_layer* il = (typeof(il))l;
 
+	struct am_timeline_interval_layer* il = (typeof(il))l;
 	am_timeline_interval_layer_set_color_map(il, &static_colors);
 
 	return am_timeline_interval_layer_set_max_index(
-		il, static_colors.num_elements-1);
+		il,
+		static_colors.num_elements-1);
 }
 
 static int trace_changed_per_discrete_ecoll_array(struct am_timeline_render_layer* l,
@@ -130,11 +127,14 @@ static size_t calculate_index_stack_frame_period(struct am_timeline_interval_lay
 {
 	struct am_stack_frame_period* sfp = arg;
 	struct am_stack_frame* sf = sfp->stack_frame;
+	struct am_function_symbol* sym = sf->function_symbol;
 
-	// get a new color from the color map
+	if(strncmp(sym->name, ".omp_outlined", 13) == 0)
+		return 0;
+
 	uint64_t address_identifier = (uint64_t) sf;
 	
-	size_t ret = am_stateful_color_map_get_color_index(address_identifier);
+	size_t ret = am_stateful_color_map_indexer_get_color_index(address_identifier);
 
 	return ret;
 }
@@ -174,25 +174,19 @@ static int renderer_changed_function_symbol(struct am_timeline_render_layer* l,
 		return 0;
 }
 
-// Changed this from taking a random address and taking modulo of it to get color (i.e. conflict)
-// to instead get programmatically and consistently from a static color map
 static size_t calculate_index_function_symbol(struct am_timeline_interval_layer* l, void* arg)
 {
 	struct am_stack_frame_period* sfp = arg;
 	struct am_function_symbol_array* sarr;
-	struct am_function_symbol* s;
+	struct am_function_symbol* sym;
 
-	s = sfp->stack_frame->function_symbol;
-	/*
-	sarr = am_timeline_interval_layer_get_extra_data(l);
+	sym = sfp->stack_frame->function_symbol;
+	
+	if(strncmp(sym->name, ".omp_outlined", 13) == 0)
+		return 0;
 
-	size_t idx = am_function_symbol_array_index(sarr, s);
-
-	size_t ret = (idx % (openmp_colors.num_elements - 1));
-	*/
-
-	uint64_t address_identifier = (uint64_t) s;
-	size_t ret = am_stateful_color_map_get_color_index(address_identifier);
+	uint64_t address_identifier = (uint64_t) sym;
+	size_t ret = am_stateful_color_map_indexer_get_color_index(address_identifier);
 	
 	return ret;
 }
