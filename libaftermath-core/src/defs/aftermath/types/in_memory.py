@@ -210,6 +210,7 @@ am_function_symbol = InMemoryCompoundType(
     entity = "function symbol",
     comment = "A function symbol, as declared in the program's symbol table",
     ident = "am::core::function_symbol",
+    tags = [ tags.mem.dfg.DeclareConstPointerType() ],
 
     fields = FieldList([
         Field(

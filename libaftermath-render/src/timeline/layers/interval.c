@@ -479,7 +479,7 @@ int am_timeline_interval_layer_get_dominant_element(
 			am_interval_intersection_duration(i, query, &offs);
 			void* element_ptr = AM_PTR_SUB(i, interval_field_offset);
 
-			// Check if this period is not visible
+			// Check if this period is not rendered
 			if(ilt->calculate_index){
 				if(ilt->calculate_index(il, element_ptr) == 0)
 					continue;

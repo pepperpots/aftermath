@@ -64,6 +64,7 @@ nobase_include_HEADERS = aftermath/core/ansi_extras.h \
 	aftermath/core/dfg/nodes/select_nth.h \
 	aftermath/core/dfg/nodes/state_description_attributes.h \
 	aftermath/core/dfg/nodes/stack_frame_period_attributes.h \
+	aftermath/core/dfg/nodes/function_symbol_attributes.h \
 	aftermath/core/dfg/nodes/state_event_attributes.h \
 	aftermath/core/dfg/nodes/string_concat.h \
 	aftermath/core/dfg/nodes/string_constant.h \

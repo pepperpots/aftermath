@@ -68,6 +68,8 @@ int am_dfg_string_concat_node_process(struct am_dfg_node* n)
 	struct am_dfg_port* pin = &n->ports[0];
 	struct am_dfg_port* pout = &n->ports[1];
 	size_t nsamples;
+	size_t num_non_empty_samples = 0;
+	size_t non_empty_samples_processed = 0;
 	size_t alloc_size = 0;
 	size_t nsep = 0;
 	size_t nsep_chars;
@@ -83,14 +85,36 @@ int am_dfg_string_concat_node_process(struct am_dfg_node* n)
 
 	in = pin->buffer->data;
 
+	num_non_empty_samples = 0;
 	/* Count total number of characters */
 	for(size_t i = 0; i < nsamples; i++) {
+
+		/* We don't want spurious seperators when inputs are empty strings */
+		if(strlen(in[i]) == 0)
+			continue;
+
+		num_non_empty_samples++;
+
 		if(am_size_inc_safe(&alloc_size, strlen(in[i])))
 			return 1;
 	}
 
-	if(nsamples != 0)
-		nsep = nsamples - 1;
+	if(num_non_empty_samples == 0){
+
+		if(!(str = malloc(1)))
+			return 1;
+
+		str[0] = '\0';
+
+		if(am_dfg_buffer_write(pout->buffer, 1, &str)) {
+			free(str);
+			return 1;
+		}
+
+		return 0;
+	}
+
+	nsep = num_non_empty_samples - 1;
 
 	if(am_size_mul_safe(&nsep_chars, nsep, f->separator_len))
 		return 1;
@@ -110,13 +134,19 @@ int am_dfg_string_concat_node_process(struct am_dfg_node* n)
 		 * size_t doesn't overflow */
 		len = strlen(in[i]);
 
+		if(len == 0)
+			continue;
+
 		memcpy(&str[pos], in[i], len);
 		pos += len;
 
-		if(i != nsamples - 1) {
+		if(non_empty_samples_processed != nsep) {
 			memcpy(&str[pos], f->separator, f->separator_len);
 			pos += f->separator_len;
 		}
+
+		non_empty_samples_processed++;
+
 	}
 
 	str[pos] = '\0';

@@ -128,6 +128,10 @@
 #include <aftermath/core/dfg/nodes/stack_frame_period_attributes.h>
 
 #undef DEFS_NAME
+#define DEFS_NAME() function_symbol_attributes_defs
+#include <aftermath/core/dfg/nodes/function_symbol_attributes.h>
+
+#undef DEFS_NAME
 #define DEFS_NAME() select_nth_defs
 #include <aftermath/core/dfg/nodes/select_nth.h>
 
@@ -213,6 +217,7 @@ static struct am_dfg_static_node_type_def** defsets[] = {
 	select_nth_defs,
 	state_description_attributes_defs,
 	stack_frame_period_attributes_defs,
+	function_symbol_attributes_defs,
 	state_event_attributes_defs,
 	string_concat_defs,
 	string_constant_defs,

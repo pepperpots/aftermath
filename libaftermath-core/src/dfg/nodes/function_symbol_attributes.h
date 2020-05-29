@@ -16,29 +16,29 @@
  * USA.
  */
 
-#ifndef AM_DFG_NODE_STACK_FRAME_PERIOD_ATTRIBUTES_H
-#define AM_DFG_NODE_STACK_FRAME_PERIOD_ATTRIBUTES_H
+#ifndef AM_DFG_NODE_FUNCTION_SYMBOL_ATTRIBUTES_H
+#define AM_DFG_NODE_FUNCTION_SYMBOL_ATTRIBUTES_H
 
 #include <aftermath/core/dfg_node.h>
 
-int am_dfg_stack_frame_period_attributes_node_process(struct am_dfg_node* n);
+int am_dfg_function_symbol_attributes_node_process(struct am_dfg_node* n);
 
 /* Node extracting individual fields from astream of stack frame periods */
 AM_DFG_DECL_BUILTIN_NODE_TYPE(
-	am_dfg_stack_frame_period_attributes_node_type,
-	"am::core::stack_frame_period::attributes",
-	"Stack Frame Period Description Attributes",
+	am_dfg_function_symbol_attributes_node_type,
+	"am::core::function_symbol::attributes",
+	"Function Symbol Description Attributes",
 	AM_DFG_NODE_DEFAULT_SIZE,
 	AM_DFG_DEFAULT_PORT_DEPS_PURE_FUNCTIONAL,
 	AM_DFG_NODE_FUNCTIONS({
-		.process = am_dfg_stack_frame_period_attributes_node_process
+		.process = am_dfg_function_symbol_attributes_node_process
 	}),
 	AM_DFG_NODE_PORTS(
-		{ "in", "const am::core::stack_frame_period*", AM_DFG_PORT_IN },
+		{ "in", "const am::core::function_symbol*", AM_DFG_PORT_IN },
 		{ "name", "am::core::string", AM_DFG_PORT_OUT }),
 	AM_DFG_PORT_DEPS(),
 	AM_DFG_NODE_PROPERTIES())
 
-AM_DFG_ADD_BUILTIN_NODE_TYPES(&am_dfg_stack_frame_period_attributes_node_type)
+AM_DFG_ADD_BUILTIN_NODE_TYPES(&am_dfg_function_symbol_attributes_node_type)
 
 #endif

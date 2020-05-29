@@ -16,10 +16,10 @@
  * USA.
  */
 
-#include "stack_frame_period_attributes.h"
+#include "function_symbol_attributes.h"
 #include <aftermath/core/hierarchy.h>
 
-int am_dfg_stack_frame_period_attributes_node_process(struct am_dfg_node* n)
+int am_dfg_function_symbol_attributes_node_process(struct am_dfg_node* n)
 {
 	// If there was no valid input stack frame period, then we write an empty string to buffer
 
@@ -48,12 +48,9 @@ int am_dfg_stack_frame_period_attributes_node_process(struct am_dfg_node* n)
 				if(nodes[i] != NULL){
 					// replace our empty info message
 
-					sprintf(message, "Period %lu/%lu for stack frame %p executing '%s' at depth %lu",
-						nodes[i]->rank+1, // because zero indexed
-						nodes[i]->stack_frame->num_periods,
-						nodes[i]->stack_frame,
+					sprintf(message, "Symbol '%s' at address '%lu'",
 						nodes[i]->stack_frame->function_symbol->name,
-						nodes[i]->stack_frame->depth);
+						nodes[i]->stack_frame->function_symbol->addr);
 
 					free(info);
 					if(!(info = strdup(message)))
