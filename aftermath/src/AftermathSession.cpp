@@ -1,5 +1,6 @@
 /**
  * Author: Andi Drebes <andi@drebesium.org>
+ * Author: Richard Neill <richard.neill@manchester.ac.uk>
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License version 2 as published by the
@@ -19,6 +20,8 @@
 #include "dfg/nodes/builtin_nodes.h"
 #include "dfg/nodes/gui/histogram.h"
 #include "dfg/nodes/gui/hierarchy_combobox.h"
+#include "dfg/nodes/gui/stack_frame_depth_filter_combobox.h"
+#include "dfg/nodes/gui/function_symbol_filter_combobox.h"
 #include "dfg/nodes/gui/label.h"
 #include "dfg/nodes/gui/telamon_candidate_tree.h"
 #include "dfg/nodes/gui/timeline.h"
@@ -28,6 +31,8 @@
 #include "gui/widgets/DFGWidget.h"
 #include "gui/widgets/LabelWithDFGNode.h"
 #include "gui/widgets/HierarchyComboBox.h"
+#include "gui/widgets/StackFrameDepthFilterComboBox.h"
+#include "gui/widgets/FunctionSymbolFilterComboBox.h"
 #include "gui/widgets/HistogramWidget.h"
 #include "gui/widgets/TelamonCandidateTreeWidget.h"
 #include "gui/widgets/TimelineWidget.h"
@@ -63,6 +68,160 @@ extern "C" {
 	#include <aftermath/core/function_symbol_array.h>
 	#include <aftermath/core/stack_frame_array.h>
 	#include <aftermath/core/stack_frame_period_array.h>
+}
+
+/* Dump the call graph as a flat file that I can parse easily later */
+void dumpCallGraph(am_trace* trace)
+{
+	
+  am_event_collection_array ecs = trace->event_collections;
+
+  // For each event collection
+  for(unsigned i = 0; i < ecs.num_elements; i++)
+  {
+
+    am_array_collection* ac = &ecs.elements[i].event_arrays;
+
+    // For each event type
+    for(unsigned j = 0; j < ac->num_elements; j++)
+    {
+      am_array_collection_entry ace = ac->elements[j];
+			std::cout << "Collection type = " << ace.type << std::endl;
+      
+			if(strcmp("am::core::stack_frame_period", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_stack_frame_period* events = (am_stack_frame_period*) array->elements;
+
+				// Per each frame period
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+					am_stack_frame_period* period = &events[k];
+
+					std::cout << "period," << i << ",";
+					std::cout << period->interval.start << "," << period->interval.end << ",";
+					std::cout << period->stack_frame << "," << period->stack_frame->parent_frame << ",";
+					std::cout << period->stack_frame->interval.start << "," << period->stack_frame->interval.end << ",";
+					std::cout << period->stack_frame->depth << "," << period->stack_frame->function_symbol->name << std::endl;
+
+				}
+
+			}
+
+			if(strcmp("am::openmp::implicit_task", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_openmp_implicit_task* events = (am_openmp_implicit_task*) array->elements;
+
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+					am_openmp_implicit_task* event = &events[k];
+
+					std::cout << "implicit_task," << i << ",";
+					std::cout << event->interval.start << "," << event->interval.end << ",";
+					std::cout << (event->flags == 1 ? "initial" : "implicit") << std::endl;
+
+				}
+			}
+
+      if(strcmp("am::openmp::task_create", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_openmp_task_create* events =
+          (am_openmp_task_create*) array->elements;
+
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+					am_openmp_task_create* event = &events[k];
+
+					std::cout << "task_creation," << i << "," << event->timestamp << ",";
+					std::cout << event->codeptr_ra << ",";
+					std::cout << event->task_id << "," << event->new_task_id << std::endl;
+
+				}
+			}
+      
+			if(strcmp("am::openmp::parallel", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_openmp_parallel* events =
+          (am_openmp_parallel*) array->elements;
+
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+					am_openmp_parallel* event = &events[k];
+
+					std::cout << "parallel_region," << i << ",";
+					std::cout << event->interval.start << "," << event->interval.end << ",";
+					std::cout << event->requested_parallelism << std::endl;
+
+				}
+			}
+			
+			if(strcmp("am::openmp::thread", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_openmp_thread* events = (am_openmp_thread*) array->elements;
+
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+					am_openmp_thread* event = &events[k];
+
+					std::cout << "thread," << i << ",";
+					std::cout << event->interval.start << "," << event->interval.end << std::endl;
+
+				}
+
+			}
+			
+			if(strcmp("am::openmp::task_period", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_openmp_task_period* events = (am_openmp_task_period*) array->elements;
+
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+					am_openmp_task_period* event = &events[k];
+
+					// it turns out that these periods might be from different CPUs
+					// for now, just store the CPU with the period
+					std::cout << "task_period," << event->cpu << ",";
+					std::cout << event->task_instance << "," << event->task_instance->first_start << "," << event->task_instance->last_end << ",";
+					std::cout << event->interval.start << "," << event->interval.end << "," << event->task_instance->prior_task_id << "," << event->task_instance->task_id << std::endl;
+
+				}
+
+			}
+			
+			if(strcmp("am::openmp::sync_region", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_openmp_sync_region* events = (am_openmp_sync_region*) array->elements;
+
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+					am_openmp_sync_region* event = &events[k];
+
+					std::cout << "sync_region," << i << ",";
+					std::cout << event->interval.start << "," << event->interval.end << std::endl;
+
+				}
+
+			}
+
+		}
+
+	}
+
+	exit(0);
+
 }
 
 /* TODO: Temporary chaining of stack frames together by their execution interval */
@@ -405,6 +564,9 @@ void processTrace(am_trace* trace, std::map<uint64_t, std::string>& symbols_by_a
   std::map<uint64_t, am_openmp_for_loop_type*> for_loop_type_map;
   std::map<uint64_t, am_openmp_for_loop_instance*> for_loop_instance_map;
   std::map<std::pair<uint64_t, std::pair<int64_t, int64_t>>, am_openmp_iteration_set*> iter_set_map;
+
+	// vector is a pair of (CPU, start/end)
+	std::map<am_openmp_task_instance*, std::vector<std::pair<uint8_t, std::pair<uint64_t, uint64_t> > > > task_periods_by_instance;
 				
   // We first lift per trace types
   // For each event collection
@@ -449,6 +611,7 @@ void processTrace(am_trace* trace, std::map<uint64_t, std::string>& symbols_by_a
 
           // And now create a new instance
           uint64_t task_id = events[k].new_task_id;
+					std::cout << "New tcreate with task_id " << events[k].task_id << " and new_task_id " << task_id << std::endl;
 
           am_openmp_task_instance* new_instance =
               (am_openmp_task_instance*)malloc(sizeof(am_openmp_task_instance));
@@ -456,6 +619,8 @@ void processTrace(am_trace* trace, std::map<uint64_t, std::string>& symbols_by_a
           am_openmp_task_type* tt = task_type_map.at(codeptr_ra);
 
           new_instance->task_type = tt;
+					new_instance->task_id = task_id;
+					new_instance->prior_task_id = events[k].task_id;
 
           task_instance_map.emplace(task_id, new_instance);
 
@@ -563,35 +728,102 @@ void processTrace(am_trace* trace, std::map<uint64_t, std::string>& symbols_by_a
         am_openmp_task_schedule* events =
           (am_openmp_task_schedule*) array->elements;
 
-        am_timestamp_t prior_timestamp = events[0].timestamp;
-
         // For each event
-        for(unsigned k = 1; k < array->num_elements; k++)
+        for(unsigned k = 0; k < array->num_elements; k++)
         {
           am_timestamp_t new_timestamp = events[k].timestamp;
 
-          uint64_t task_id = events[k].prior_task_id;
+					std::cout << "task_schedule:" << i << "," << events[k].timestamp;
+					std::cout << "," << events[k].prior_task_id << "," << events[k].next_task_id << "," << events[k].prior_task_status;
+					std::cout << std::endl;
 
-          // Only add period if there was a task running
-          if(task_id != 0)
-          {
-            // TODO: Temporary hack, we need to handle case when the
-            // task is tied to loop (see BOTS)
-            am_openmp_task_instance* ti = NULL;
-            if(task_instance_map.count(task_id) != 0)
-              ti = task_instance_map.at(task_id);
+          uint64_t prior_task_id = events[k].prior_task_id;
+					// 
+					if(prior_task_id != 0){
+						
+						//std::cout << "Finishing period of " << prior_task_id << std::endl;
 
-            am_openmp_task_period* new_period =
-              (am_openmp_task_period*) malloc(sizeof(am_openmp_task_period));
+						// finish the period of the previous instance
+						am_openmp_task_instance* previous_ti = NULL;
+						if(task_instance_map.count(prior_task_id) != 0){
+							
+							previous_ti = task_instance_map.at(prior_task_id);
+							
+							// because the periods start and end on one CPU, the back() pair will always match this one
+							if(task_periods_by_instance.count(previous_ti) != 0){
+								task_periods_by_instance.at(previous_ti).back().second.second = new_timestamp;
+							} else {
+								std::cerr << "Cannot find task instance for prior task id" << std::endl;
+								exit(1);
+							}
 
-            new_period->task_instance = ti;
-            new_period->interval = {prior_timestamp, new_timestamp};
+						} else {
+							std::cerr << "Could not find the previous instance's task id in the map." << std::endl;
+							exit(1);
+						}
 
-            am_openmp_task_period_array_appendp(task_periods, new_period);
-          }
+						// check if the previous instance was completed
+						if(events[k].prior_task_status == 1){
 
-          prior_timestamp = new_timestamp;
-        }
+							//std::cout << prior_task_id << " was completed." << std::endl;
+
+							// then create the periods, assign first and last of the instance
+							auto period_vector = task_periods_by_instance[previous_ti];
+
+							bool first_set = false;
+							for(auto pair : period_vector){
+
+								am_openmp_task_period* new_period =
+									(am_openmp_task_period*) malloc(sizeof(am_openmp_task_period));
+
+								new_period->cpu = pair.first;
+								new_period->task_instance = previous_ti;
+								new_period->interval = {pair.second.first, pair.second.second};
+
+								am_openmp_task_period_array_appendp(task_periods, new_period);
+
+								if(first_set == false){
+									first_set = true;
+									previous_ti->first_start = pair.second.first;
+								}
+
+								previous_ti->last_end = pair.second.second;
+
+							}
+
+						}
+						
+					}
+
+					uint64_t task_id = events[k].next_task_id; // this is the one that is being scheduled
+						
+					// if the scheduling point has a prior type of 'fullfilled', then there is no next period
+					if(task_id != 0){
+
+						//std::cout << "Starting period of " << task_id << std::endl;
+
+						am_openmp_task_instance* ti = NULL;
+						if(task_instance_map.count(task_id) != 0){
+							
+							ti = task_instance_map.at(task_id);
+
+							if(task_periods_by_instance.count(ti) != 0){
+								task_periods_by_instance.at(ti).push_back(std::make_pair(i,std::make_pair(new_timestamp, 0)));
+							} else {
+								std::vector<std::pair<uint8_t, std::pair<uint64_t,uint64_t> > > periods;
+								periods.push_back(std::make_pair(i, std::make_pair(new_timestamp, 0)));
+								task_periods_by_instance[ti] = periods;
+							}
+
+						} else {
+							std::cerr << "Could not find the starting period's task id (" << task_id << ") in the map." << std::endl;
+							exit(1);
+						}
+
+					}
+
+				}
+
       }
 
       // Loops
@@ -735,6 +967,8 @@ void processTrace(am_trace* trace, std::map<uint64_t, std::string>& symbols_by_a
   }*/
 
 	buildCallGraph(trace, symbols_by_addr);
+	
+	dumpCallGraph(trace);
 
 }
 
@@ -1051,7 +1285,7 @@ void AftermathSession::loadTrace(
 
 		} catch(...) {
 			// We couldn't get symbols from the provided binary
-			// TODO perhaps just continue?
+			// TODO perhaps just continue with unknown symbols
 			throw;
 		}
 	}
@@ -1184,6 +1418,32 @@ int AftermathSession::DFGNodeInstantiationCallback(
 				return 1;
 
 			hcb->widget->setDFGNode(n);
+		} catch(...) {
+			return 1;
+		}
+	} else if(strcmp(n->type->name, "am::gui::stack_frame_depth_filter_combobox") == 0) {
+		struct am_dfg_amgui_stack_frame_depth_filter_combobox_node* cb = (typeof(cb))n;
+
+		try {
+			w = session->getGUI().getWidget(cb->widget_id);
+
+			if(!(cb->widget = dynamic_cast<StackFrameDepthFilterComboBox*>(w)))
+				return 1;
+
+			cb->widget->setDFGNode(n);
+		} catch(...) {
+			return 1;
+		}
+	} else if(strcmp(n->type->name, "am::gui::function_symbol_filter_combobox") == 0) {
+		struct am_dfg_amgui_function_symbol_filter_combobox_node* cb = (typeof(cb))n;
+
+		try {
+			w = session->getGUI().getWidget(cb->widget_id);
+
+			if(!(cb->widget = dynamic_cast<FunctionSymbolFilterComboBox*>(w)))
+				return 1;
+
+			cb->widget->setDFGNode(n);
 		} catch(...) {
 			return 1;
 		}

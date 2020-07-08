@@ -24,6 +24,14 @@
 #include "gui/hierarchy_combobox.h"
 
 #undef DEFS_NAME
+#define DEFS_NAME() amgui_stack_frame_depth_filter_combobox_defs
+#include "gui/stack_frame_depth_filter_combobox.h"
+
+#undef DEFS_NAME
+#define DEFS_NAME() amgui_function_symbol_filter_combobox_defs
+#include "gui/function_symbol_filter_combobox.h"
+
+#undef DEFS_NAME
 #define DEFS_NAME() amgui_histogram_defs
 #include "gui/histogram.h"
 
@@ -50,6 +58,8 @@
 /* Final list of all lists of node types from all headers included above */
 static struct am_dfg_static_node_type_def** defsets[] = {
 	amgui_hierarchy_combobox_defs,
+	amgui_stack_frame_depth_filter_combobox_defs,
+	amgui_function_symbol_filter_combobox_defs,
 	amgui_histogram_defs,
 	amgui_label_defs,
 	amgui_telamon_candidate_tree_defs,

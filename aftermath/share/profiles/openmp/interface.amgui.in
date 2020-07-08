@@ -183,47 +183,86 @@ am_gui {
 					]
 				},
 
-				amgui_hsplitter {
-					stretch: [10u64, 90u64],
+				amgui_vsplitter {
+					stretch: [85u64, 15u64],
 					children: [
-						amgui_tabs {
-							tab_names: [ "Options" ],
-
-							children : [
-								amgui_vbox {
+						amgui_vsplitter {
+							stretch: [95u64, 05u64],
+							children: [
+								amgui_hsplitter {
+									stretch: [10u64, 90u64],
 									children: [
-										amgui_label {
-											text: "Hierarchy:"
+										amgui_tabs {
+											tab_names: [ "Options" ],
+
+											children : [
+												amgui_vbox {
+													children: [
+														amgui_label {
+															text: "Hierarchy:"
+														},
+														amgui_hierarchy_combobox {
+															id: "hierarchy_cb1"
+														},
+														amgui_label {
+															text: "Stack Frame Depth:"
+														},
+														amgui_stack_frame_depth_filter_combobox {
+															id: "stack_frame_depth_filter_cb1"
+														},
+														amgui_label {
+															text: "Function:"
+														},
+														amgui_function_symbol_filter_combobox {
+															id: "function_symbol_filter_cb1"
+														}
+													]
+												}
+											]
 										},
 
-										amgui_hierarchy_combobox {
-											id: "hierarchy_cb1"
+										amgui_tabs {
+											tab_names: [ "Timeline", "DFG" ],
+
+											children : [
+												amgui_timeline {
+													id: "tl1",
+													layers: ["background", "hierarchy", "axes", "core::stack_frame_period", "core::function_symbol", "openmp::for_loop_type", "openmp::for_loop_instance", "openmp::iteration_set", "openmp::iteration_period", "openmp::task_type", "openmp::task_instance", "openmp::task_period", "openmp::thread", "openmp::parallel", "openmp::implicit_task", "openmp::sync_region", "openmp::work", "openmp::master", "openmp::sync_region_wait", "openmp::nest_lock", "openmp::flush", "openmp::mutex_acquire", "openmp::mutex_acquired", "openmp::mutex_released", "openmp::lock_init", "openmp::lock_destroy", "openmp::task_create", "openmp::task_schedule", "openmp::dependences", "openmp::task_dependence", "openmp::cancel", "state", "selection"]
+												},
+
+												amgui_dfg { }
+											]
+										}
+									]
+								},
+								amgui_statusbar {
+									children: [
+										amgui_label {
+											text: "Ready.",
+											id: "statusbar_label"
 										}
 									]
 								}
 							]
 						},
-
-						amgui_tabs {
-							tab_names: [ "Timeline", "DFG" ],
-
-							children : [
-								amgui_timeline {
-									id: "tl1",
-									layers: ["background", "hierarchy", "axes", "core::stack_frame_period", "core::function_symbol", "openmp::for_loop_type", "openmp::for_loop_instance", "openmp::iteration_set", "openmp::iteration_period", "openmp::task_type", "openmp::task_instance", "openmp::task_period", "openmp::thread", "openmp::parallel", "openmp::implicit_task", "openmp::sync_region", "openmp::work", "openmp::master", "openmp::sync_region_wait", "openmp::nest_lock", "openmp::flush", "openmp::mutex_acquire", "openmp::mutex_acquired", "openmp::mutex_released", "openmp::lock_init", "openmp::lock_destroy", "openmp::task_create", "openmp::task_schedule", "openmp::dependences", "openmp::task_dependence", "openmp::cancel", "state", "selection"]
+						amgui_hsplitter {
+							stretch: [30u64, 70u64],
+							children: [
+								amgui_vbox {
+									children: [
+										amgui_label {
+											text: "Layer information: state of the filters, function breakdowns, number of events, interval histogram"
+										}
+									]
 								},
-
-								amgui_dfg { }
+								amgui_vbox {
+									children: [
+										amgui_label {
+											text: "On-click information..." 
+										}
+									]
+								}
 							]
-						}
-					]
-				},
-
-				amgui_statusbar {
-					children: [
-						amgui_label {
-							text: "Ready.",
-							id: "statusbar_label"
 						}
 					]
 				}

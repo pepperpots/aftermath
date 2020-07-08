@@ -97,4 +97,13 @@ int am_timeline_interval_layer_get_dominant_element(
 	const struct am_interval* query,
 	uint64_t* address_of_element);
 
+/* Return a pointer to the stack frame period displayed at the interval, which
+ * has been potentially filtered
+ */
+int am_timeline_interval_layer_get_dominant_filterable_stack_frame_period(
+	struct am_timeline_interval_layer* il,
+	struct am_hierarchy_node* hn,
+	const struct am_interval* query,
+	uint64_t* address_of_element);
+
 #endif

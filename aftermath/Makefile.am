@@ -18,6 +18,10 @@ aftermath_SOURCES = src/AftermathSession.cpp \
 	src/dfg/nodes/builtin_nodes.c \
 	src/dfg/nodes/gui/hierarchy_combobox.h \
 	src/dfg/nodes/gui/hierarchy_combobox.cpp \
+	src/dfg/nodes/gui/stack_frame_depth_filter_combobox.h \
+	src/dfg/nodes/gui/stack_frame_depth_filter_combobox.cpp \
+	src/dfg/nodes/gui/function_symbol_filter_combobox.h \
+	src/dfg/nodes/gui/function_symbol_filter_combobox.cpp \
 	src/dfg/nodes/gui/histogram.h \
 	src/dfg/nodes/gui/histogram.cpp \
 	src/dfg/nodes/gui/label.h \
@@ -55,6 +59,10 @@ aftermath_SOURCES = src/AftermathSession.cpp \
 	src/gui/factory/GUIFactory.h \
 	src/gui/factory/HierarchyComboBoxCreator.h \
 	src/gui/factory/HierarchyComboBoxCreator.cpp \
+	src/gui/factory/StackFrameDepthFilterComboBoxCreator.h \
+	src/gui/factory/StackFrameDepthFilterComboBoxCreator.cpp \
+	src/gui/factory/FunctionSymbolFilterComboBoxCreator.h \
+	src/gui/factory/FunctionSymbolFilterComboBoxCreator.cpp \
 	src/gui/factory/HistogramWidgetCreator.cpp \
 	src/gui/factory/HistogramWidgetCreator.h \
 	src/gui/factory/LabelWidgetCreator.cpp \
@@ -91,6 +99,12 @@ aftermath_SOURCES = src/AftermathSession.cpp \
 	src/gui/widgets/HierarchyComboBox.cpp \
 	src/gui/widgets/moc_HierarchyComboBox.cpp \
 	src/gui/widgets/HierarchyComboBox.h \
+	src/gui/widgets/StackFrameDepthFilterComboBox.cpp \
+	src/gui/widgets/moc_StackFrameDepthFilterComboBox.cpp \
+	src/gui/widgets/StackFrameDepthFilterComboBox.h \
+	src/gui/widgets/FunctionSymbolFilterComboBox.cpp \
+	src/gui/widgets/moc_FunctionSymbolFilterComboBox.cpp \
+	src/gui/widgets/FunctionSymbolFilterComboBox.h \
 	src/gui/widgets/HistogramWidget.cpp \
 	src/gui/widgets/HistogramWidget.h \
 	src/gui/widgets/KDTreeWidget.cpp \
@@ -228,6 +242,8 @@ GENERATED_FILES=src/ui_MainWindow.h \
 	src/gui/widgets/moc_CairoWidgetWithDFGNode.cpp \
 	src/gui/widgets/moc_DFGWidget.cpp \
 	src/gui/widgets/moc_HierarchyComboBox.cpp \
+	src/gui/widgets/moc_StackFrameDepthFilterComboBox.cpp \
+	src/gui/widgets/moc_FunctionSymbolFilterComboBox.cpp \
 	src/gui/widgets/moc_LabelWithDFGNode.cpp \
 	src/gui/widgets/moc_KDTreeWidget.cpp \
 	src/gui/widgets/moc_RectTreeWidget.cpp \
@@ -322,6 +338,16 @@ src/gui/widgets/moc_HierarchyComboBox.cpp: \
 	src/gui/widgets/HierarchyComboBox.cpp \
 	src/gui/widgets/HierarchyComboBox.h
 	$(moc_verbose)$(MOC) $(MOCFLAGS) $(srcdir)/src/gui/widgets/HierarchyComboBox.h -o $@
+
+src/gui/widgets/moc_StackFrameDepthFilterComboBox.cpp: \
+	src/gui/widgets/StackFrameDepthFilterComboBox.cpp \
+	src/gui/widgets/StackFrameDepthFilterComboBox.h
+	$(moc_verbose)$(MOC) $(MOCFLAGS) $(srcdir)/src/gui/widgets/StackFrameDepthFilterComboBox.h -o $@
+
+src/gui/widgets/moc_FunctionSymbolFilterComboBox.cpp: \
+	src/gui/widgets/FunctionSymbolFilterComboBox.cpp \
+	src/gui/widgets/FunctionSymbolFilterComboBox.h
+	$(moc_verbose)$(MOC) $(MOCFLAGS) $(srcdir)/src/gui/widgets/FunctionSymbolFilterComboBox.h -o $@
 
 src/gui/widgets/moc_ToolbarButton.cpp: \
 	src/gui/widgets/ToolbarButton.cpp \

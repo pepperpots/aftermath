@@ -421,7 +421,7 @@ int am_render_dfg_timeline_openmp_function_symbol_layer_dominant_period_at_pos_n
 AM_DFG_DECL_BUILTIN_NODE_TYPE(
 	am_render_dfg_timeline_openmp_function_symbol_layer_dominant_period_at_pos_node_type,
 	"am::render::timeline::layer::openmp::function_symbol::dominant_period_at_pos",
-	"Dominant Stack Frame Frame Period at Position",
+	"Dominant Function Symbol at Position",
 	AM_DFG_NODE_DEFAULT_SIZE,
 	AM_DFG_DEFAULT_PORT_DEPS_PURE_FUNCTIONAL,
 	AM_DFG_NODE_FUNCTIONS({

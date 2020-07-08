@@ -220,7 +220,17 @@ am_function_symbol = InMemoryCompoundType(
         Field(
             name = "name",
             field_type = aftermath.types.base.am_string,
-            comment = "Name of the symbol")]))
+            comment = "Name of the symbol"),
+				Field(
+						name = "post_filter_include",
+            field_type = aftermath.types.base.am_bool_t,
+						comment = "Has this symbol made it through the filters") # TODO this should be auto added by some 'filterable' tag
+				]))
+
+am_function_symbol.addTag(
+    aftermath.tags.GenerateDefaultConstructor(field_values = [
+				("post_filter_include", "1")
+    ]))
 
 ################################################################################
 
@@ -249,7 +259,11 @@ am_stack_frame = InMemoryCompoundType(
 				Field(
 						name = "depth",
 						field_type = aftermath.types.builtin.size_t,
-						comment = "Depth of the frame in the call-stack")
+						comment = "Depth of the frame in the call-stack"),
+				Field(
+						name = "post_filter_include",
+            field_type = aftermath.types.base.am_bool_t,
+						comment = "Has this frame made it through the filters") # TODO this should be auto added by some 'filterable' tag
 				]))
 
 am_stack_frame_period = InMemoryCompoundType(
@@ -318,6 +332,7 @@ am_stack_frame.addTag(
     aftermath.tags.GenerateDefaultConstructor(field_values = [
         ("function_symbol", "NULL"),
 				("depth", "0"),
+				("post_filter_include", "1"),
         ("parent_frame", "NULL"),
         ("num_child_frames", "0"),
         ("child_frames", "NULL"),

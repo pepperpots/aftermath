@@ -1,5 +1,6 @@
 /**
  * Author: Andi Drebes <andi@drebesium.org>
+ * Author: Richard Neill <richard.neill@manchester.ac.uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as published
@@ -22,6 +23,7 @@
 #include <aftermath/core/typed_list.h>
 #include <aftermath/core/base_types.h>
 #include <aftermath/core/event_mapping.h>
+#include <aftermath/core/event_filter.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -83,6 +85,7 @@ struct am_hierarchy_node {
 	struct am_hierarchy_node* parent;
 	struct list_head siblings;
 	struct am_event_mapping event_mapping;
+	struct am_event_filter event_filter;
 };
 
 #define am_hierarchy_node_for_each_child(hnode, child) \

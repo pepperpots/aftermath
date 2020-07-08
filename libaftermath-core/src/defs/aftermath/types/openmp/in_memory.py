@@ -564,6 +564,22 @@ am_openmp_task_instance = InMemoryCompoundType(
 
     fields = FieldList([
         Field(
+            name = "first_start",
+            field_type = aftermath.types.base.am_timestamp_t,
+            comment = "Start of the first period"),
+        Field(
+            name = "last_end",
+            field_type = aftermath.types.base.am_timestamp_t,
+            comment = "End of the last period"),
+        Field(
+            name = "prior_task_id",
+            field_type = aftermath.types.builtin.uint64_t,
+            comment = "Unique id of the encountering task"),
+        Field(
+            name = "task_id",
+            field_type = aftermath.types.builtin.uint64_t,
+            comment = "Unique id of this task"),
+        Field(
             name = "task_type",
             field_type = am_openmp_task_type,
             is_pointer = True,
@@ -583,6 +599,10 @@ am_openmp_task_period = InMemoryCompoundType(
                 field_type = am_openmp_task_instance,
                 is_pointer = True,
                 comment = "Task execution instance this period belongs to"),
+            Field(
+                name = "cpu",
+                field_type = aftermath.types.builtin.uint32_t,
+                comment = "CPU that executed the period"), # TEMP
             Field(
                 name = "interval",
                 field_type = aftermath.types.in_memory.am_interval,

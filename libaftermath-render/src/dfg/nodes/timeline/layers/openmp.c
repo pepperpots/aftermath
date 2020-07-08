@@ -118,7 +118,8 @@ int am_render_dfg_timeline_openmp_stack_frame_period_layer_dominant_period_at_po
 				px_interval.end--;
 
 			/* Determine dominant element */
-			am_timeline_interval_layer_get_dominant_element(
+			//am_timeline_interval_layer_get_dominant_element(
+			am_timeline_interval_layer_get_dominant_filterable_stack_frame_period(
 				   (struct am_timeline_interval_layer*)layer,
 				   mouse_pos[j].node,
 				   &px_interval,

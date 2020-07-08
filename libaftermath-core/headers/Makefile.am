@@ -92,6 +92,7 @@ nobase_include_HEADERS = aftermath/core/ansi_extras.h \
 	aftermath/core/dfg/types/int.h \
 	aftermath/core/dfs.h \
 	aftermath/core/event_mapping.h \
+	aftermath/core/event_filter.h \
 	aftermath/core/event_collection.h \
 	aftermath/core/event_collection_array.h \
 	aftermath/core/frame_type_registry.h \

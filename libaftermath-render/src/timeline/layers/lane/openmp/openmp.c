@@ -132,11 +132,32 @@ static size_t calculate_index_stack_frame_period(struct am_timeline_interval_lay
 	if(strncmp(sym->name, ".omp_outlined", 13) == 0)
 		return 0;
 
-	uint64_t address_identifier = (uint64_t) sf;
-	
-	size_t ret = am_stateful_color_map_indexer_get_color_index(address_identifier);
+	// TODO need some way to check if a filter has been enabled, so we don't waste time
+	int frame_is_top = 1;
+	while(1){
+		if(sf->post_filter_include == 0 || sym->post_filter_include == 0){
+			if(sf->parent_frame != NULL){
+				sf = sf->parent_frame;
+				sym = sf->function_symbol;
+				frame_is_top = 0;
+			} else {
+				return 0;
+			}
+		} else {
+			break; // frame is good
+		}
+	}
 
-	return ret;
+	// if we are here, then we have found a frame that satisfies all filters (although it might require low alpha)
+	uint64_t address_identifier = (uint64_t) sf;
+
+	// TODO check these modulo ops work correctly at bounds
+	// TODO let the indexer give the correct value (pass in whether we want full alpha or low alpha)
+	if(frame_is_top == 1)
+		return am_stateful_color_map_indexer_get_color_index(address_identifier) % ((static_colors.num_elements/2)-1);
+	else 
+		return (am_stateful_color_map_indexer_get_color_index(address_identifier) % ((static_colors.num_elements/2)-1)) + static_colors.num_elements/2;
+
 }
 
 struct am_timeline_render_layer_type*
@@ -177,16 +198,37 @@ static int renderer_changed_function_symbol(struct am_timeline_render_layer* l,
 static size_t calculate_index_function_symbol(struct am_timeline_interval_layer* l, void* arg)
 {
 	struct am_stack_frame_period* sfp = arg;
-	struct am_function_symbol_array* sarr;
-	struct am_function_symbol* sym;
+	struct am_stack_frame* sf = sfp->stack_frame;
+	struct am_function_symbol* sym = sf->function_symbol;
 
-	sym = sfp->stack_frame->function_symbol;
-	
 	if(strncmp(sym->name, ".omp_outlined", 13) == 0)
 		return 0;
 
+	int frame_is_top = 1;
+	while(1){
+		// check that *both* filters are satisfied!
+		if(sf->post_filter_include == 0 || sym->post_filter_include == 0){
+			if(sf->parent_frame != NULL){
+				sf = sf->parent_frame;
+				sym = sf->function_symbol;
+				frame_is_top = 0;
+			} else {
+				return 0;
+			}
+		} else {
+			// we have found a frame that satisfies the filter, it might be at the top or it might not be
+			break;
+		}
+	}
+
 	uint64_t address_identifier = (uint64_t) sym;
 	size_t ret = am_stateful_color_map_indexer_get_color_index(address_identifier);
+
+	// TODO as above
+	if(frame_is_top == 1)
+		return am_stateful_color_map_indexer_get_color_index(address_identifier) % ((static_colors.num_elements/2)-1);
+	else 
+		return (am_stateful_color_map_indexer_get_color_index(address_identifier) % ((static_colors.num_elements/2)-1)) + static_colors.num_elements/2;
 	
 	return ret;
 }

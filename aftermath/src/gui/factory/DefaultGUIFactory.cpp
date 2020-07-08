@@ -1,5 +1,6 @@
 /**
  * Author: Andi Drebes <andi@drebesium.org>
+ * Author: Richard Neill <richard.neill@manchester.ac.uk>
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License version 2 as published by the
@@ -21,6 +22,8 @@
 #include "ButtonWidgetCreator.h"
 #include "DFGWidgetCreator.h"
 #include "HierarchyComboBoxCreator.h"
+#include "StackFrameDepthFilterComboBoxCreator.h"
+#include "FunctionSymbolFilterComboBoxCreator.h"
 #include "HistogramWidgetCreator.h"
 #include "LabelWidgetCreator.h"
 #include "SplitterWidgetCreator.h"
@@ -40,6 +43,8 @@ DefaultGUIFactory::DefaultGUIFactory(class AftermathSession* session) :
 	this->addCreator(new DFGWidgetCreator());
 	this->addCreator(new HistogramWidgetCreator());
 	this->addCreator(new HierarchyComboBoxCreator());
+	this->addCreator(new StackFrameDepthFilterComboBoxCreator());
+	this->addCreator(new FunctionSymbolFilterComboBoxCreator());
 	this->addCreator(new HSplitterWidgetCreator());
 	this->addCreator(new VSplitterWidgetCreator());
 	this->addCreator(new LabelWidgetCreator());

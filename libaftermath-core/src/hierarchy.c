@@ -1,5 +1,6 @@
 /**
  * Author: Andi Drebes <andi@drebesium.org>
+ * Author: Richard Neill <richard.neill@manchester.ac.uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as published
@@ -17,6 +18,7 @@
  */
 
 #include <aftermath/core/hierarchy.h>
+#include <aftermath/core/event_filter.h>
 #include <stdio.h>
 
 /* Initialize a hierarchy without duplicating the string pointed to by "name" by
@@ -95,6 +97,7 @@ void am_hierarchy_node_init_nodup(struct am_hierarchy_node* hn,
 		am_hierarchy_node_set_name_nodup(hn, name);
 
 	am_event_mapping_init(&hn->event_mapping);
+	am_event_filter_init(&hn->event_filter);
 }
 
 /* Initialize a hierarchy node. Name can be NULL. Returns 0 on success,
@@ -125,6 +128,7 @@ void am_hierarchy_node_destroy(struct am_hierarchy_node* hn)
 	}
 
 	am_event_mapping_destroy(&hn->event_mapping);
+	am_event_filter_destroy(&hn->event_filter);
 
 	free(hn->name);
 }
