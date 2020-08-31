@@ -220,8 +220,6 @@ void dumpCallGraph(am_trace* trace)
 
 	}
 
-	exit(0);
-
 }
 
 /* TODO: Temporary chaining of stack frames together by their execution interval */
@@ -327,8 +325,6 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 						strncpy(new_sym->name, sym_name_str.c_str(), sym_name_str.length());
 						new_sym->name[sym_name_str.length()] = '\0';
 
-						//std::cout << "Setting address " << frame->addr << " to " << sym_name_str << std::endl;
-
             function_symbol_map.emplace(frame->addr, new_sym);
             am_function_symbol_array_appendp(function_symbols, new_sym);
           }
@@ -395,8 +391,6 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 									period_before_start->rank = period_iter->second.size();
 									period_iter->second.push_back(period_before_start);
 								}
-								
-								//fprintf(stdout,"Tracing period (after child start) for frame %p with symbol %s from %lu to %lu.\n", top_frame, top_frame->function_symbol->name, period_start, period_end);
 
 								am_stack_frame_period_array_appendp(stack_frame_periods, period_before_start);
 
@@ -430,7 +424,6 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 					frame->depth = current_call_stack.size() + 1;
 
 					// push the newly started frame to the call stack
-					//fprintf(stdout, "Started new period of frame %p with symbol %s at %lu.\n", frame, frame->function_symbol->name, frame->interval.start);
 					current_call_stack.push_back(frame);
 
 				}
@@ -460,8 +453,6 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 							ending_period->rank = period_iter->second.size();
 							period_iter->second.push_back(ending_period);
 						}
-						
-						//fprintf(stdout,"Tracing final ending period for frame %p with symbol %s from %lu to %lu.\n", top_frame, top_frame->function_symbol->name, period_start, period_end);
 						
 						am_stack_frame_period_array_appendp(stack_frame_periods, ending_period);
 
@@ -533,7 +524,7 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 
 /* TODO: Temporary processing function for loop/task types, instances, set,
    periods */
-void processTrace(am_trace* trace, std::map<uint64_t, std::string>& symbols_by_addr)
+void processTrace(am_trace* trace, std::map<uint64_t, std::string>& symbols_by_addr, bool dump_callstack)
 {
   am_event_collection_array ecs = trace->event_collections;
 
@@ -800,8 +791,6 @@ void processTrace(am_trace* trace, std::map<uint64_t, std::string>& symbols_by_a
 					// if the scheduling point has a prior type of 'fullfilled', then there is no next period
 					if(task_id != 0){
 
-						//std::cout << "Starting period of " << task_id << std::endl;
-
 						am_openmp_task_instance* ti = NULL;
 						if(task_instance_map.count(task_id) != 0){
 							
@@ -968,7 +957,8 @@ void processTrace(am_trace* trace, std::map<uint64_t, std::string>& symbols_by_a
 
 	buildCallGraph(trace, symbols_by_addr);
 	
-	dumpCallGraph(trace);
+	if(dump_callstack)
+		dumpCallGraph(trace);
 
 }
 
@@ -1238,7 +1228,8 @@ std::map<uint64_t, std::string> AftermathSession::parseBinarySymbols(const char*
 void AftermathSession::loadTrace(
 	const char* filename,
 	unsigned id,
-	const char* binary_filename)
+	const char* binary_filename,
+	bool dump_callstack)
 {
 	struct am_trace* trace;
 	struct am_io_context ioctx;
@@ -1296,7 +1287,7 @@ void AftermathSession::loadTrace(
   /* NO-body expects the Spanish Inquisition! */
   /* TODO: Temporary hack to create Aftermath types from
      raw OMPT data */
-  processTrace(trace, symbol_table);
+  processTrace(trace, symbol_table, dump_callstack);
 
 	this->setTrace(trace, id);
 }

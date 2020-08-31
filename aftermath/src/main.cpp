@@ -68,7 +68,7 @@ static void print_usage(void)
  */
 static void parse_options(struct am_options* o, int argc, char** argv)
 {
-	static const char* options_str = "hd:p:su:b:";
+	static const char* options_str = "hd:p:su:b:o:";
 	int opt;
 
 	/* Default values */
@@ -79,6 +79,7 @@ static void parse_options(struct am_options* o, int argc, char** argv)
 	o->profile_name = "";
 	o->binary_filename = "";
 	o->dfg_safe_mode = false;
+	o->dump_callstack = false;
 
 	opterr = 0;
 
@@ -98,6 +99,9 @@ static void parse_options(struct am_options* o, int argc, char** argv)
 				break;
 			case 'b':
 				o->binary_filename = optarg;
+				break;
+			case 'o':
+				o->dump_callstack = true;
 				break;
 			case 'h':
 				o->print_usage = 1;
@@ -174,7 +178,7 @@ int aftermath_main(const struct am_options* o,
 		QShortcut guiManagerShortcut(QKeySequence(Qt::Key_F12),
 					     &mainWindow);
 
-		session.loadTrace(o->trace_filename.c_str(), 0, o->binary_filename.c_str()); // why are we not using std::string?
+		session.loadTrace(o->trace_filename.c_str(), 0, o->binary_filename.c_str(), o->dump_callstack); // why are we not using std::string?
 		//session.loadTrace(o->trace_filename_2.c_str(), 1, o->binary_filename.c_str());
 		factory.buildGUI(&gui, o->ui_filename.c_str());
 		session.loadDFG(o->dfg_filename.c_str());

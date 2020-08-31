@@ -26,7 +26,7 @@ int am_dfg_stack_frame_period_attributes_node_process(struct am_dfg_node* n)
 	struct am_dfg_port* pin = &n->ports[0];
 	struct am_dfg_port* pnames = &n->ports[1];
 	struct am_stack_frame_period** nodes;
-	size_t old_num_samples;
+	size_t old_num_samples = 0;
 	char* info;
 	size_t nin;
 
