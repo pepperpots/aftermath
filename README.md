@@ -80,6 +80,7 @@ Currently, there are 5 profiles:
 * `telamon` (Telamon code optimizer)
 * `telamon-candidate-stats` (same as telamon, but with additional statistics)
 * `openmp` (basic OpenMP support)
+* `ompt` (`openmp` + OMPT events)
 * `tensorflow` (very basic TensorFlow support)
 
 ## Python bindings
@@ -136,6 +137,12 @@ for event_collection in t.getEventCollections():
         
     print("Event collection has {} state events".format(num_state_events))
 ```
+
+## Custom types and tools
+
+As Aftermath features an extensible type system, it can be used to trace and visualize any arbitrary
+data type. Moreover, Aftermath tracing API can be used to create custom profiling tools. For more
+information please see [here](docs/README.md).
 
 ## Credits
 
