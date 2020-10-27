@@ -108,6 +108,26 @@ void dumpCallGraph(am_trace* trace)
 				}
 
 			}
+			
+			if(strcmp("am::core::stack_frame", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_stack_frame* events = (am_stack_frame*) array->elements;
+
+				// Per each frame period
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+					am_stack_frame* frame = &events[k];
+
+					std::cout << "stack_frame," << i << ",";
+					std::cout << frame->interval.start << "," << frame->interval.end << ",";
+					std::cout << frame << "," << frame->parent_frame << ",";
+					std::cout << frame->depth << "," << frame->function_symbol->name << std::endl;
+
+				}
+
+			}
 
 			if(strcmp("am::openmp::implicit_task", ace.type) == 0)
       {
@@ -174,6 +194,24 @@ void dumpCallGraph(am_trace* trace)
 
 					std::cout << "thread," << i << ",";
 					std::cout << event->interval.start << "," << event->interval.end << std::endl;
+
+				}
+
+			}
+			
+			if(strcmp("am::openmp::work", ace.type) == 0)
+      {
+        am_typed_array_generic* array = ace.array;
+
+        am_openmp_work* events = (am_openmp_work*) array->elements;
+
+        for(unsigned k = 0; k < array->num_elements; k++)
+        {
+					am_openmp_work* event = &events[k];
+
+					std::cout << "work," << i << ",";
+					std::cout << event->interval.start << "," << event->interval.end;
+					std::cout << "," << event->type << "," << event->count << std::endl;
 
 				}
 
@@ -282,7 +320,9 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 
 				std::vector<struct am_stack_frame*> current_call_stack;
 
+#ifdef PARSE_SFP
 				uint64_t previous_period_end = 0;
+#endif
 
 				// Per each frame
         for(unsigned k = 0; k < array->num_elements; k++)
@@ -345,6 +385,7 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 							if(top_frame->interval.end < frame->interval.start){
 								// the top frame finished before I started, so I am at least at the same depth as the current top frame (and will need to recurse further to check if I'm less deep)
 
+#ifdef PARSE_SFP
 								uint64_t period_start = previous_period_end;
 								uint64_t period_end = top_frame->interval.end;
 
@@ -368,12 +409,14 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 								am_stack_frame_period_array_appendp(stack_frame_periods, ending_period);
 
 								previous_period_end = period_end; // this will then be the starting time for the next period
+#endif
 								current_call_stack.pop_back();
 
 							} else {
 								// so it didn't finish before I started, meaning I am a child of the parent
 								// I should therefore trace a period from the previous end to my start and add it to the parent
 								
+#ifdef PARSE_SFP
 								uint64_t period_start = previous_period_end;
 								uint64_t period_end = frame->interval.start;
 
@@ -395,12 +438,14 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 								am_stack_frame_period_array_appendp(stack_frame_periods, period_before_start);
 
 								previous_period_end = period_end;
-
+#endif
 								process_exits = false;
 							}
 						} else {
 							process_exits = false;
+#ifdef PARSE_SFP
 							previous_period_end = frame->interval.start;
+#endif
 						}
 					}
 
@@ -432,6 +477,7 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 				bool process_exits = true;
 				while(process_exits){
 					if(current_call_stack.size() > 0){
+#ifdef PARSE_SFP
 						am_stack_frame* top_frame = current_call_stack.back();
 
 						// there are no more frame starts, so just trace from previous_period_end to the frame's end
@@ -457,6 +503,7 @@ void buildCallGraph(am_trace* trace, std::map<uint64_t, std::string>& symbols_by
 						am_stack_frame_period_array_appendp(stack_frame_periods, ending_period);
 
 						previous_period_end = period_end;
+#endif
 						current_call_stack.pop_back();
 
 					} else {
@@ -1177,12 +1224,14 @@ std::map<uint64_t, std::string> AftermathSession::parseBinarySymbols(const char*
 
 	std::stringstream ss;
 	ss << R"(sh -c ")";
-	ss << R"(nm -l -td )" << binary_filename;
-	ss << R"( | grep '[0-9A-Fa-f]* [tT]')";
+	ss << R"(nm -C -td )" << binary_filename;
+	ss << R"( | grep '[0-9A-Fa-f] [A-Za-z]')";
 	ss << R"( | sed -e 's/:/ /g' -e 's/[\t]/ /g' -e 's/[ ]\{1,\}/ /g')";
 	ss << R"(" 2> /dev/null)";
 
 	std::string command = ss.str();
+
+	std::cout << "Command is: " << command << std::endl;
 	
 	char buffer[256];
 	std::string result = "";
@@ -1200,21 +1249,33 @@ std::map<uint64_t, std::string> AftermathSession::parseBinarySymbols(const char*
 	std::vector<std::string> lines = split_string_to_vector(result, '\n');
 	for(auto line : lines){
 		std::vector<std::string> words = split_string_to_vector(line, ' ');
-		if(words.size() != 3 || !(words.at(1) == "T" || words.at(1) == "t") || words.at(0) == "")
+		//if(words.size() != 3 || !(words.at(1) == "T" || words.at(1) == "t") || words.at(0) == "")
+		if(words.at(0) == "")
 			continue; // just ignore any symbols we can't parse
 			//throw AftermathException("Failed to parse binary symbol results via: " + command);
-		
+
+		std::stringstream symbol_ss;
+		for(unsigned int i=2; i<words.size(); i++){
+			symbol_ss << words.at(i);
+			if(i+1 != words.size())
+				symbol_ss << " ";
+		}
+
 		// first word is address
 		// second word is the symbol type
 		// third word is the symbol name
 		size_t char_idx = 0;
 		uint64_t addr = std::stoull(words.at(0), &char_idx, 10);
 	
-		symbols_by_addr.insert(std::make_pair(addr, words.at(2)));
+		symbols_by_addr.insert(std::make_pair(addr, symbol_ss.str()));
 		
 	}
 
 	pclose(fp);
+
+	std::cout << "Debugging:" << std::endl;
+	for(auto it : symbols_by_addr)
+		std::cout << it.first << ":" << it.second << std::endl;
 
 	return symbols_by_addr;
 
@@ -1279,6 +1340,8 @@ void AftermathSession::loadTrace(
 			// TODO perhaps just continue with unknown symbols
 			throw;
 		}
+	} else {
+		std::cout << "Binary filename was not provided." << std::endl;
 	}
 
 	am_io_context_destroy(&ioctx);

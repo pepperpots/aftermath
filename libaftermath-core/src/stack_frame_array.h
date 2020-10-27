@@ -24,7 +24,7 @@
 #include <aftermath/core/bsearch.h>
 #include <aftermath/core/interval_array.h>
 
-AM_DECL_TYPED_ARRAY(am_stack_frame_array, struct am_stack_frame)
+AM_DECL_TYPED_ARRAY_CUSTOM_PREALLOC(am_stack_frame_array, struct am_stack_frame, 16384)
 
 AM_DECL_INTERVAL_EVENT_ARRAY_BSEARCH_FIRST_OVERLAPPING(am_stack_frame_array,
 						       struct am_stack_frame,

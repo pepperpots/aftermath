@@ -261,6 +261,208 @@ struct am_typed_array_generic {
 		a->num_elements = 0;					\
 	}
 
+/* Declare a new type of arrays with a custom num_prealloc. The macro parameter 'prefix' defines the prefix
+ * for the type of the structure as well as for all operations. */
+#define AM_DECL_TYPED_ARRAY_EXTRA_FIELDS_NO_DESTRUCTOR_CUSTOM_PREALLOC(prefix, T, NUM_PREALLOC, extra_fields) \
+	struct prefix {						\
+		size_t num_elements;					\
+		size_t num_free;					\
+		size_t num_prealloc;					\
+		T* elements;						\
+		extra_fields						\
+	};								\
+									\
+	typedef T prefix##_element_type;				\
+									\
+	static inline int prefix##_reserve_pos(struct prefix* a,	\
+					       size_t pos);		\
+	static inline int prefix##_reserve_end(struct prefix* a);	\
+	static inline int prefix##_appendp(struct prefix* a,		\
+					   T* e);			\
+	static inline int prefix##_append(struct prefix* a,		\
+					  T e);			\
+	static inline int prefix##_insertp(struct prefix* a,		\
+					   size_t pos, T* e);		\
+	static inline int prefix##_insert(struct prefix* a,		\
+					  size_t pos, T e);		\
+	static inline int prefix##_prealloc_n(struct prefix* a,	\
+					      size_t n);		\
+	static inline int prefix##_prealloc(struct prefix* a);		\
+	static inline void prefix##_init(struct prefix* a);		\
+	static inline size_t prefix##_index(const struct prefix* a,	\
+					    const T* e);		\
+									\
+	static inline int prefix##_is_element_ptr(const struct prefix* a, \
+						  T* e);		\
+									\
+	/* Checks if e is a pointer to an element of the array. */	\
+	static inline int prefix##_is_element_ptr(const struct prefix* a, \
+						  T* e)		\
+	{								\
+		return ((uintptr_t)e) >= ((uintptr_t)a->elements) &&	\
+			((uintptr_t)e) < ((uintptr_t)&a->elements[a->num_elements]); \
+	}								\
+									\
+	static inline size_t prefix##_index(const struct prefix* a,	\
+					    const T* e)		\
+	{								\
+		return (((uintptr_t)e) - ((uintptr_t)a->elements)) /	\
+			sizeof(a->elements[0]);			\
+	}								\
+									\
+	/* Reserves space for at least one element at position p. */	\
+	/* Returns 0 on success, otherwise 1. */			\
+	static inline int prefix##_reserve_pos(struct prefix* a,	\
+					       size_t pos)		\
+	{								\
+		if(pos > a->num_elements)				\
+			return 1;					\
+									\
+		if(prefix##_prealloc(a))				\
+			return 1;					\
+									\
+		if(pos < a->num_elements) {				\
+			memmove(&a->elements[pos+1],			\
+				&a->elements[pos],			\
+				(a->num_elements-pos)*sizeof(T));	\
+		}							\
+									\
+		a->num_free--;						\
+		a->num_elements++;					\
+									\
+		return 0;						\
+	}								\
+									\
+	/* Reserves space for at least one element at the end. */	\
+	/* Returns 0 on success, otherwise 1. */			\
+	static inline int prefix##_reserve_end(struct prefix* a)	\
+	{								\
+		return prefix##_reserve_pos(a, a->num_elements);	\
+	}								\
+									\
+	/* Add an element by reference to the array. Returns 0 on */	\
+	/* success, otherwise 1. */					\
+	static inline int prefix##_appendp(struct prefix* a, T* e)	\
+	{								\
+		return am_add_buffer_grow((void**)&a->elements,	\
+					  e,				\
+					  sizeof(T),			\
+					  &a->num_elements,		\
+					  &a->num_free,		\
+					  a->num_prealloc);		\
+	}								\
+									\
+	/* Add an element by value to the array. Returns 0 on */	\
+	/* success, otherwise 1. */					\
+	static inline int prefix##_append(struct prefix* a, T e)	\
+	{								\
+		if(am_check_buffer_grow((void**)&a->elements,		\
+					sizeof(T),			\
+					a->num_elements,		\
+					&a->num_free,			\
+					a->num_prealloc))		\
+		{							\
+			return 1;					\
+		}							\
+									\
+		a->elements[a->num_elements] = e;			\
+		a->num_elements++;					\
+		a->num_free--;						\
+									\
+		return 0;						\
+	}								\
+									\
+	/* Insert an element by address into the array at position p. */\
+	/* Returns 0 on success, otherwise 1. */			\
+	static inline int prefix##_insertp(struct prefix* a,		\
+					   size_t pos, T* e)		\
+	{								\
+		if(prefix##_reserve_pos(a, pos))			\
+			return 1;					\
+									\
+		a->elements[pos] = *e;					\
+									\
+		return 0;						\
+	}								\
+									\
+	/* Remove the element at position p from the array. */		\
+	static inline void prefix##_remove(struct prefix* a,		\
+					   size_t pos)			\
+	{								\
+		if(pos >= a->num_elements)				\
+			return;					\
+									\
+		if(pos+1 < a->num_elements) {				\
+			memmove(&a->elements[pos],			\
+				&a->elements[pos+1],			\
+				(a->num_elements - pos - 1) * sizeof(T)); \
+		}							\
+									\
+		a->num_free++;						\
+		a->num_elements--;					\
+	}								\
+									\
+	/* Remove the element pointed to by e from the array. */	\
+	static inline void prefix##_removep(struct prefix* a, T* e)	\
+	{								\
+		size_t pos;						\
+									\
+		if(!prefix##_is_element_ptr(a, e))			\
+			return;					\
+									\
+		pos = (((uintptr_t)e) - ((uintptr_t)a->elements)) / sizeof(T);\
+									\
+		prefix##_remove(a, pos);				\
+	}								\
+									\
+	/* Insert an element by value into the array at position p. */	\
+	/* Returns 0 on success, otherwise 1. */			\
+	static inline int prefix##_insert(struct prefix* a,		\
+					  size_t pos, T e)		\
+	{								\
+		return prefix##_insertp(a, pos, &e);			\
+	}								\
+									\
+	/* Pre-allocates space for at least n new elements. Returns 0 */\
+	/* on success, otherwise 1. */					\
+	static inline int prefix##_prealloc_n(struct prefix* a,	\
+					      size_t n)		\
+	{								\
+		return am_check_buffer_grow_n((void**)&a->elements,	\
+					      sizeof(T),		\
+					      a->num_elements,		\
+					      &a->num_free,		\
+					      n,			\
+					      a->num_prealloc);	\
+	}								\
+									\
+	/* Pre-allocates space for a number of new elements defined */	\
+	/* a->num_prealloc. Returns 0 on success, otherwise 1. */	\
+	static inline int prefix##_prealloc(struct prefix* a)		\
+	{								\
+		return prefix##_prealloc_n(a, a->num_prealloc);	\
+	}								\
+									\
+	/* Initialize an array. The array will be empty without any */	\
+	/* space pre-allocated. */					\
+	static inline void prefix##_init(struct prefix* a)		\
+	{								\
+		a->num_elements = 0;					\
+		a->num_free = 0;					\
+		a->num_prealloc = NUM_PREALLOC;	\
+		a->elements = NULL;					\
+	}								\
+									\
+	/* Resets the array (sets the number of elements to 0 and the	\
+	 * number of free elements to the total capacity). Note that	\
+	 * this function does not call any destructor on the elements.	\
+	 */								\
+	static inline void prefix##_reset(struct prefix* a)		\
+	{								\
+		a->num_free += a->num_elements;			\
+		a->num_elements = 0;					\
+	}
+
 #define AM_DECL_TYPED_ARRAY_EXTRA_FIELDS(prefix, T, extra_fields)		\
 	AM_DECL_TYPED_ARRAY_EXTRA_FIELDS_NO_DESTRUCTOR(prefix, T, extra_fields) \
 	AM_DECL_TYPED_ARRAY_DEFAULT_DESTRUCTOR(prefix, prefix##_destroy)
@@ -276,6 +478,13 @@ struct am_typed_array_generic {
 	AM_DECL_TYPED_ARRAY_DEFAULT_DESTRUCTOR_WITH_ELEMENTS(prefix,		\
 							     prefix##_destroy,	\
 							     element_destr)
+
+#define AM_DECL_TYPED_ARRAY_EXTRA_FIELDS_CUSTOM_PREALLOC(prefix, T, num_prealloc, extra_fields)		\
+	AM_DECL_TYPED_ARRAY_EXTRA_FIELDS_NO_DESTRUCTOR_CUSTOM_PREALLOC(prefix, T, num_prealloc, extra_fields) \
+	AM_DECL_TYPED_ARRAY_DEFAULT_DESTRUCTOR(prefix, prefix##_destroy)
+
+#define AM_DECL_TYPED_ARRAY_CUSTOM_PREALLOC(prefix, T, num_prealloc)	\
+	AM_DECL_TYPED_ARRAY_EXTRA_FIELDS_CUSTOM_PREALLOC(prefix, T, num_prealloc, )
 
 /* Declare a binary seach function for a typed array. prefix and T must be the
  * same values as those used in DECL_TYPED_ARRAY. suffix is simply appended to
