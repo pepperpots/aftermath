@@ -148,6 +148,11 @@ static size_t calculate_index_stack_frame_period(struct am_timeline_interval_lay
 		}
 	}
 
+#if 1
+  // Pass function name to the renderer
+	am_timeline_interval_layer_set_extra_data(l, sym->name);
+#endif
+
 	// if we are here, then we have found a frame that satisfies all filters (although it might require low alpha)
 	uint64_t address_identifier = (uint64_t) sf;
 
@@ -220,6 +225,11 @@ static size_t calculate_index_function_symbol(struct am_timeline_interval_layer*
 			break;
 		}
 	}
+
+#if 1
+  // Pass function name to the rendered
+	am_timeline_interval_layer_set_extra_data(l, sym->name);
+#endif
 
 	uint64_t address_identifier = (uint64_t) sym;
 	size_t ret = am_stateful_color_map_indexer_get_color_index(address_identifier);
@@ -1100,7 +1110,16 @@ static size_t calculate_index_work(
 {
 	struct am_openmp_work* m = arg;
 
-	return 4;
+#if 1
+  // Pass text to the renderer
+	// am_timeline_interval_layer_set_extra_data(l, "work_share_region");
+
+	return am_stateful_color_map_indexer_get_color_index(0) % ((static_colors.num_elements/2)-1);;
+#endif
+
+#if 0
+  return 4;
+#endif
 }
 
 struct am_timeline_render_layer_type*

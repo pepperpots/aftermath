@@ -208,6 +208,31 @@ static void render(struct am_timeline_interval_layer* il,
 						px - last_start_px,
 						lane_height);
 				cairo_fill(cr);
+
+#if 1
+        char* text = am_timeline_interval_layer_get_extra_data(il);
+        if(text != NULL) {
+          // Create a clipping rectangle (the same rectangle as the interval)
+          cairo_rectangle(cr,
+              last_start_px + 0.5,
+              0,
+              px - last_start_px,
+              lane_height);
+          // Clip path so text only displays within the interval
+          cairo_clip(cr);
+          // Get dimensions of the text, so it can be centred
+          cairo_text_extents_t extents;
+          cairo_text_extents(cr, text, &extents);
+          // Text colour and size
+          cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
+          cairo_set_font_size(cr, 20);
+          // Positions text at the beginning of the interval vertically centred
+          cairo_move_to(cr, last_start_px + 5, extents.height/2 + lane_height / 2);
+          cairo_show_text(cr, text);
+          // Remove clipping area
+          cairo_reset_clip(cr);
+        }
+#endif
 			}
 		}
 
@@ -234,6 +259,25 @@ static void render(struct am_timeline_interval_layer* il,
 					ceil(lane_width) - last_start_px,
 					lane_height);
 			cairo_fill(cr);
+
+#if 1
+      char* text = am_timeline_interval_layer_get_extra_data(il);
+      if(text != NULL) {
+        cairo_rectangle(cr,
+            last_start_px + 0.5,
+            0,
+            ceil(lane_width) - last_start_px,
+            lane_height);
+        cairo_clip(cr);
+        cairo_text_extents_t extents;
+        cairo_text_extents(cr, text, &extents);
+        cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
+        cairo_set_font_size(cr, 20);
+        cairo_move_to(cr, last_start_px + 5, extents.height/2 + lane_height / 2);
+        cairo_show_text(cr, text);
+        cairo_reset_clip(cr);
+      }
+#endif
 		}
 	}
 }

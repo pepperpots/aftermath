@@ -227,7 +227,7 @@ am_gui {
 											children : [
 												amgui_timeline {
 													id: "tl1",
-													layers: ["background", "hierarchy", "axes", "core::stack_frame_period", "core::function_symbol", "openmp::for_loop_type", "openmp::for_loop_instance", "openmp::iteration_set", "openmp::iteration_period", "openmp::task_type", "openmp::task_instance", "openmp::task_period", "openmp::thread", "openmp::parallel", "openmp::implicit_task", "openmp::sync_region", "openmp::work", "openmp::master", "openmp::sync_region_wait", "openmp::nest_lock", "openmp::flush", "openmp::mutex_acquire", "openmp::mutex_acquired", "openmp::mutex_released", "openmp::lock_init", "openmp::lock_destroy", "openmp::task_create", "openmp::task_schedule", "openmp::dependences", "openmp::task_dependence", "openmp::cancel", "state", "selection"]
+													layers: ["background", "hierarchy", "axes", "openmp::work", "core::stack_frame_period", "core::function_symbol", "openmp::for_loop_type", "openmp::for_loop_instance", "openmp::iteration_set", "openmp::iteration_period", "openmp::task_type", "openmp::task_instance", "openmp::task_period", "openmp::thread", "openmp::parallel", "openmp::implicit_task", "openmp::sync_region", "openmp::master", "openmp::sync_region_wait", "openmp::nest_lock", "openmp::flush", "openmp::mutex_acquire", "openmp::mutex_acquired", "openmp::mutex_released", "openmp::lock_init", "openmp::lock_destroy", "openmp::task_create", "openmp::task_schedule", "openmp::dependences", "openmp::task_dependence", "openmp::cancel", "state", "selection"]
 												},
 
 												amgui_dfg { }
