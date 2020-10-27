@@ -103,7 +103,8 @@ class AftermathSession {
 		void loadTrace(
 			const char* filename,
 			unsigned id,
-			const char* binary_filename);
+			const char* binary_filename,
+			bool dump_callstack);
 
 		void loadDFG(const char* filename);
 

@@ -73,7 +73,7 @@ extern "C" {
 /* Dump the call graph as a flat file that I can parse easily later */
 void dumpCallGraph(am_trace* trace)
 {
-	
+
   am_event_collection_array ecs = trace->event_collections;
 
   // For each event collection
@@ -1003,7 +1003,7 @@ void processTrace(am_trace* trace, std::map<uint64_t, std::string>& symbols_by_a
   }*/
 
 	buildCallGraph(trace, symbols_by_addr);
-	
+
 	if(dump_callstack)
 		dumpCallGraph(trace);
 

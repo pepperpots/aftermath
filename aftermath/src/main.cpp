@@ -45,6 +45,7 @@ struct am_options {
 		std::string binary_filename;
 		bool print_usage;
 		bool dfg_safe_mode;
+		bool dump_callstack;
 };
 
 static void print_usage(void)
@@ -60,6 +61,7 @@ static void print_usage(void)
 		"  -d dfg_file    Load DFG definition from dfg_file.\n"
 		"  -u ui_file     Load user interface from ui_file.\n"
 		"  -b binary_file Load symbol table from binary file.\n"
+		"  -o             Dump the callstack to STDOUT.\n"
 		"  -s             Ignore errors during initial scheduling of DFG.\n";
 }
 
@@ -68,7 +70,7 @@ static void print_usage(void)
  */
 static void parse_options(struct am_options* o, int argc, char** argv)
 {
-	static const char* options_str = "hd:p:su:b:o:";
+	static const char* options_str = "hd:p:su:ob:";
 	int opt;
 
 	/* Default values */
@@ -101,6 +103,7 @@ static void parse_options(struct am_options* o, int argc, char** argv)
 				o->binary_filename = optarg;
 				break;
 			case 'o':
+				std::cout << "SET DUMP_CALLSTACK = TRUE" << std::endl;
 				o->dump_callstack = true;
 				break;
 			case 'h':

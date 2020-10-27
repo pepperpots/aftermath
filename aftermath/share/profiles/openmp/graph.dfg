@@ -353,20 +353,10 @@ am_dfg_graph {
 		am::core::string_concat {
 				id: 108u64,
 				separator: ", "
-			},
-		am::gui::stack_frame_depth_filter_combobox {
-				id: 109u64,
-				widget_id: "stack_frame_depth_filter_cb1"
-			},
-		am::gui::function_symbol_filter_combobox {
-				id: 110u64,
-				widget_id: "function_symbol_filter_cb1"
 			}
 		],
 	connections: [
-		[1u64, "trace", 109u64, "trace"],
-		[109u64, "filtered_trace", 110u64, "trace"],
-		[110u64, "filtered_trace", 2u64, "trace"],
+		[1u64, "trace", 2u64, "trace"],
 		[3u64, "hierarchy", 2u64, "hierarchy"],
 		[1u64, "trace", 3u64, "trace"],
 		[108u64, "out", 4u64, "in"],

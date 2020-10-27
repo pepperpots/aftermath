@@ -12,6 +12,8 @@ m4_include([m4/ax_cxx_compile_stdcxx_14.m4])
 AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_14(ext, mandatory)
 
+AC_DEFINE(PARSE_SFP)
+
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES(QT, [Qt5Core, Qt5Gui, Qt5Widgets], [],
 	[AC_MSG_ERROR([Could not find required QT libraries.])])
