@@ -60,6 +60,7 @@ nobase_include_HEADERS = aftermath/core/ansi_extras.h \
 	aftermath/core/dfg/nodes/logic.h \
 	aftermath/core/dfg/nodes/math.h \
 	aftermath/core/dfg/nodes/merge.h \
+	aftermath/core/dfg/nodes/ompt_process_trace.h \
 	aftermath/core/dfg/nodes/pair_timestamp_hierarchy_node_attributes.h \
 	aftermath/core/dfg/nodes/select_nth.h \
 	aftermath/core/dfg/nodes/state_description_attributes.h \

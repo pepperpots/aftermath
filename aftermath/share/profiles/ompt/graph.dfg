@@ -314,12 +314,16 @@ am_dfg_graph {
 		am::gui::toolbar_togglebutton {
 				id: 94u64,
 				widget_id: "toolbutton_draw_ompt_cancel"
+			},
+		am::ompt::process_trace {
+				id: 95u64
 			}
 		],
 	connections: [
-		[1u64, "trace", 2u64, "trace"],
+    [1u64, "trace", 95u64, "trace_in"],
+		[95u64, "trace_out", 2u64, "trace"],
 		[3u64, "hierarchy", 2u64, "hierarchy"],
-		[1u64, "trace", 3u64, "trace"],
+		[95u64, "trace_out", 3u64, "trace"],
 		[16u64, "out", 4u64, "in"],
 		[2u64, "mouse position", 5u64, "pairs"],
 		[5u64, "timestamp", 6u64, "in"],
@@ -414,7 +418,8 @@ am_dfg_graph {
     [94u64, "toggled", 93u64, "enable"]
 		],
 	positions: [
-		[1u64, 66.259260, 117.074074],
+		[1u64, 0.259260, 117.074074],
+		[95u64, 66.259260, 150.074074],
 		[2u64, 298.814815, 116.925926],
 		[3u64, 146.629630, 152.777778],
 		[4u64, 1419.382716, 245.111111],

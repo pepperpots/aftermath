@@ -116,6 +116,10 @@
 #include <aftermath/core/dfg/nodes/merge.h>
 
 #undef DEFS_NAME
+#define DEFS_NAME() ompt_process_trace_defs
+#include <aftermath/core/dfg/nodes/ompt_process_trace.h>
+
+#undef DEFS_NAME
 #define DEFS_NAME() pair_timestamp_hierarchy_node_attributes_defs
 #include <aftermath/core/dfg/nodes/pair_timestamp_hierarchy_node_attributes.h>
 
@@ -205,6 +209,7 @@ static struct am_dfg_static_node_type_def** defsets[] = {
 	logic_defs,
 	math_defs,
 	merge_defs,
+	ompt_process_trace_defs,
 	pair_timestamp_hierarchy_node_attributes_defs,
 	select_nth_defs,
 	state_description_attributes_defs,

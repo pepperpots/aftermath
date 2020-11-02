@@ -107,6 +107,8 @@ libaftermath_core_la_SOURCES = src/ansi_extras.c \
 				src/dfg/nodes/math.h \
 				src/dfg/nodes/merge.c \
 				src/dfg/nodes/merge.h \
+				src/dfg/nodes/ompt_process_trace.c \
+				src/dfg/nodes/ompt_process_trace.h \
 				src/dfg/nodes/pair_timestamp_hierarchy_node_attributes.c \
 				src/dfg/nodes/pair_timestamp_hierarchy_node_attributes.h \
 				src/dfg/nodes/select_nth.c \
